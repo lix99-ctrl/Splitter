@@ -137,67 +137,49 @@
                 <button onclick="switchExpenseMode('itemized')" id="mode-btn-itemized" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">Custom Itemized</button>
             </div>
 
-            <!-- Currency Settings Card for Expenses -->
+            <!-- Currency Settings Card for Expenses (Simplified - hidden manual exchange rate) -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                <h3 class="font-bold text-xs text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-coins text-indigo-400 mr-1.5"></i> Currency & Conversion Settings</h3>
-                <div class="grid grid-cols-3 gap-2">
+                <h3 class="font-bold text-xs text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-coins text-indigo-400 mr-1.5"></i> Currency Settings</h3>
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Base Currency</label>
-                        <select id="baseCurrency" onchange="onCurrencyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
+                        <label class="block text-[11px] text-slate-400 mb-1">Currency</label>
+                        <select id="baseCurrency" onchange="onCurrencyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
                             <option value="USD">USD ($)</option>
                             <option value="EUR">EUR (€)</option>
                             <option value="GBP">GBP (£)</option>
                             <option value="CAD">CAD ($)</option>
                             <option value="AUD">AUD ($)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Local Currency</label>
-                        <select id="foreignCurrency" onchange="onCurrencyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
-                            <option value="SVC">SVC (₡)</option>
                             <option value="JPY">JPY (¥)</option>
                             <option value="MXN">MXN ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="COP">COP ($)</option>
-                            <option value="USD">USD ($)</option>
+                            <option value="CHF">CHF (CHF)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">Exchange Rate</label>
-                        <input type="number" id="exchangeRate" value="8.75" step="0.01" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold text-right" title="How many Local Currency units equal 1 Base Currency unit?">
+                        <label class="block text-[11px] text-slate-400 mb-1">Payer</label>
+                        <select id="billPayer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
+                            <!-- Populated dynamically -->
+                        </select>
                     </div>
                 </div>
-                <p id="conversionRateHint" class="text-[11px] text-slate-400 italic">1 USD = 8.75 SVC (Enter local amount below to convert to base currency automatically)</p>
             </div>
 
             <!-- Quick / Even Split Section Wrapper -->
             <div id="expense-mode-quick" class="space-y-4">
                 <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-4">
                     <div class="space-y-1">
-                        <div class="flex justify-between items-center">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Local Currency Amount Received / Paid</label>
-                            <span class="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-medium">Input Local Currency</span>
-                        </div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount Paid</label>
                         <div class="relative">
-                            <span id="currencySymbol" class="absolute left-4 top-3.5 text-slate-400 text-lg font-bold">₡</span>
+                            <span id="currencySymbol" class="absolute left-4 top-3.5 text-slate-400 text-lg font-bold">$</span>
                             <input type="number" id="billAmount" placeholder="0.00" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-4 py-3 text-2xl font-bold tracking-tight focus:outline-none focus:border-indigo-500 text-white">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Paid By</label>
-                            <select id="billPayer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
-                                <!-- Populated dynamically -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Bill Title / Note</label>
-                            <input type="text" id="billTitle" placeholder="e.g. Dinner at El Tunco" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
-                        </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Bill Title / Description</label>
+                        <input type="text" id="billTitle" placeholder="e.g. Dinner & Drinks" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-2">
+                    <div class="grid grid-cols-2 gap-3 pt-1">
                         <div>
                             <div class="flex justify-between text-xs mb-1">
                                 <span class="text-slate-400">Tip</span>
@@ -217,12 +199,6 @@
                     <div class="space-y-2 pt-1">
                         <div class="flex justify-between items-center text-xs">
                             <span class="text-slate-400 font-medium">Split Between People</span>
-                            <div class="space-x-1">
-                                <button onclick="setSplitCount(2)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">2</button>
-                                <button onclick="setSplitCount(3)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">3</button>
-                                <button onclick="setSplitCount(4)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">4</button>
-                                <button onclick="setSplitCount(5)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">5</button>
-                            </div>
                         </div>
                         <div class="flex items-center space-x-3">
                             <button onclick="adjustPeople(-1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-minus"></i></button>
@@ -230,29 +206,21 @@
                             <button onclick="adjustPeople(1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs">
-                        <span class="text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Round up to nearest whole unit</span>
-                        <input type="checkbox" id="roundUp" onchange="updateCalculations()" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
-                    </div>
                 </div>
 
                 <div class="bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-indigo-500/30 rounded-2xl p-4 shadow-lg space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share (Converted)</span>
-                        <span id="localPerPersonDisplay" class="text-xs font-semibold text-slate-300 bg-slate-900/80 px-2 py-0.5 rounded-full">--</span>
-                    </div>
                     <div class="flex justify-between items-baseline">
+                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share</span>
                         <span class="text-3xl font-extrabold text-white tracking-tight" id="resultPerPerson">$0.00</span>
-                        <span class="text-xs text-slate-400">Total Base: <strong id="resultTotal" class="text-white">$0.00</strong></span>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 border-t border-slate-700/60 pt-2">
+                        <span>Total with tip & tax:</span>
+                        <strong id="resultTotal" class="text-white">$0.00</strong>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 pt-2">
-                        <button onclick="saveQuickBillToLog()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i> <span>Save to Trip Log</span>
-                        </button>
-                        <button onclick="shareSplitSummary()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-share-nodes"></i> <span>Share Text</span>
+                    <div class="pt-1">
+                        <button onclick="saveQuickBillToLog()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> <span>Save Expense to Trip Log</span>
                         </button>
                     </div>
                 </div>
@@ -265,7 +233,7 @@
                         <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split</h3>
                         <button onclick="addItemRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> Add Item</button>
                     </div>
-                    <p class="text-xs text-slate-400">Enter item name, local currency cost, and choose who pays or splits it. Rates factor in silently.</p>
+                    <p class="text-xs text-slate-400">Add individual items and assign them to specific people or split them evenly.</p>
 
                     <div id="itemList" class="space-y-3 pt-2">
                         <!-- Dynamically populated rows -->
@@ -273,13 +241,13 @@
 
                     <div class="pt-3 border-t border-slate-700/70 space-y-2">
                         <div class="flex justify-between text-xs font-semibold text-slate-400">
-                            <span>Participant Totals (Base Currency)</span>
-                            <span>Converted Total: <span id="itemizedTotalSum" class="text-white">$0.00</span></span>
+                            <span>Participant Totals</span>
+                            <span>Total: <span id="itemizedTotalSum" class="text-white">$0.00</span></span>
                         </div>
                         <div id="itemizedPersonBreakdown" class="space-y-1.5 pt-1">
                             <!-- Populated dynamically -->
                         </div>
-                        <button onclick="saveItemizedToLog()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+                        <button onclick="saveItemizedToLog()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-file-invoice-dollar"></i> <span>Record Itemized Bill</span>
                         </button>
                     </div>
@@ -361,7 +329,7 @@
     <div id="budgetModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
             <h3 class="font-bold text-sm text-white">Set Trip Budget</h3>
-            <p class="text-xs text-slate-400">Enter the maximum total budget for this trip in base currency.</p>
+            <p class="text-xs text-slate-400">Enter the maximum total budget for this trip.</p>
             <input type="number" id="tripBudgetInput" placeholder="e.g. 1500.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
             <div class="flex space-x-2 pt-2">
                 <button onclick="closeBudgetModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-xl text-xs transition">Cancel</button>
@@ -381,8 +349,6 @@
                     name: 'My First Trip',
                     budget: 0,
                     baseCurrency: 'USD',
-                    foreignCurrency: 'SVC',
-                    exchangeRate: 8.75,
                     participants: [],
                     expenses: [],
                     items: []
@@ -390,7 +356,7 @@
             ]
         };
 
-        const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', AUD: '$', SVC: '₡', JPY: '¥', MXN: '$', COP: '$' };
+        const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', AUD: '$', JPY: '¥', MXN: '$', CHF: 'CHF' };
 
         function getCurrentTrip() {
             let trip = state.trips.find(t => t.id === state.currentTripId);
@@ -438,12 +404,9 @@
             const trip = getCurrentTrip();
             if (!trip) return;
             if (!trip.baseCurrency) trip.baseCurrency = 'USD';
-            if (!trip.foreignCurrency) trip.foreignCurrency = 'SVC';
-            if (trip.exchangeRate === undefined) trip.exchangeRate = 8.75;
-
             document.getElementById('baseCurrency').value = trip.baseCurrency;
-            document.getElementById('foreignCurrency').value = trip.foreignCurrency;
-            document.getElementById('exchangeRate').value = trip.exchangeRate;
+            const sym = currencySymbols[trip.baseCurrency] || '$';
+            document.getElementById('currencySymbol').innerText = sym;
         }
 
         function toggleDarkMode() {
@@ -476,6 +439,7 @@
             }
             if (tabId === 'expenses') {
                 syncTripCurrencyUI();
+                renderPayerDropdown();
                 renderItemList();
                 renderHistory();
                 updateCalculations();
@@ -548,8 +512,6 @@
                 name: name,
                 budget: 0,
                 baseCurrency: 'USD',
-                foreignCurrency: 'SVC',
-                exchangeRate: 8.75,
                 participants: [],
                 expenses: [],
                 items: []
@@ -697,9 +659,8 @@
             const trip = getCurrentTrip();
             if (!trip) return;
             trip.baseCurrency = document.getElementById('baseCurrency').value;
-            trip.foreignCurrency = document.getElementById('foreignCurrency').value;
-            trip.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
             saveToStorage();
+            syncTripCurrencyUI();
             updateCalculations();
             renderItemList();
             renderHistory();
@@ -711,52 +672,26 @@
             const trip = getCurrentTrip();
             if (!trip) return;
 
-            const localBill = parseFloat(document.getElementById('billAmount').value) || 0;
+            const billAmount = parseFloat(document.getElementById('billAmount').value) || 0;
             const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
-            const roundUp = document.getElementById('roundUp').checked;
             
-            trip.baseCurrency = document.getElementById('baseCurrency').value;
-            trip.foreignCurrency = document.getElementById('foreignCurrency').value;
-            trip.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
-
             document.getElementById('tipValText').innerText = tipPct + '%';
             document.getElementById('taxValText').innerText = taxPct + '%';
             
-            const localSym = currencySymbols[trip.foreignCurrency] || '₡';
-            const baseSym = currencySymbols[trip.baseCurrency] || '$';
-            document.getElementById('currencySymbol').innerText = localSym;
-            document.getElementById('conversionRateHint').innerText = `1 ${trip.baseCurrency} = ${trip.exchangeRate} ${trip.foreignCurrency} (Enter local amount below to convert to base currency automatically)`;
+            const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
 
-            // Compute local currency total with tip & tax
-            const tipAmountLocal = localBill * (tipPct / 100);
-            const taxAmountLocal = localBill * (taxPct / 100);
-            let totalLocalWithExtras = localBill + tipAmountLocal + taxAmountLocal;
+            const tipAmount = billAmount * (tipPct / 100);
+            const taxAmount = billAmount * (taxPct / 100);
+            const totalWithExtras = billAmount + tipAmount + taxAmount;
             
-            let localPerPerson = splitCount > 0 ? totalLocalWithExtras / splitCount : 0;
+            const perPerson = splitCount > 0 ? totalWithExtras / splitCount : 0;
 
-            if (roundUp && localPerPerson > 0) {
-                localPerPerson = Math.ceil(localPerPerson);
-                totalLocalWithExtras = localPerPerson * splitCount;
-            }
-
-            // Convert local currency amount to Base Currency (divide by exchange rate, e.g., local / rate = base)
-            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
-            const basePerPerson = localPerPerson / rate;
-            const baseTotal = totalLocalWithExtras / rate;
-
-            // Display results
-            document.getElementById('resultPerPerson').innerText = baseSym + basePerPerson.toFixed(2);
-            document.getElementById('resultTotal').innerText = baseSym + baseTotal.toFixed(2);
-            document.getElementById('localPerPersonDisplay').innerText = `≈ ${localSym}${localPerPerson.toFixed(2)} local`;
+            document.getElementById('resultPerPerson').innerText = sym + perPerson.toFixed(2);
+            document.getElementById('resultTotal').innerText = sym + totalWithExtras.toFixed(2);
             
             saveToStorage();
-        }
-
-        function setSplitCount(num) {
-            document.getElementById('splitCount').value = num;
-            updateCalculations();
         }
 
         function adjustPeople(delta) {
@@ -846,7 +781,7 @@
         function addItemRow() {
             const trip = getCurrentTrip();
             if (!trip) return;
-            trip.items.push({ name: '', priceLocal: 0, assignedTo: '' });
+            trip.items.push({ name: '', price: 0, assignedTo: '' });
             saveToStorage();
             renderItemList();
         }
@@ -859,14 +794,25 @@
             renderItemList();
         }
 
-        function updateItemData(index, field, value) {
+        function updateItemName(index, val) {
             const trip = getCurrentTrip();
             if (!trip || !trip.items[index]) return;
-            if (field === 'priceLocal') {
-                trip.items[index].priceLocal = parseFloat(value) || 0;
-            } else {
-                trip.items[index][field] = value;
-            }
+            trip.items[index].name = val;
+            saveToStorage();
+        }
+
+        function updateItemPrice(index, val) {
+            const trip = getCurrentTrip();
+            if (!trip || !trip.items[index]) return;
+            trip.items[index].price = parseFloat(val) || 0;
+            saveToStorage();
+            renderItemList();
+        }
+
+        function updateItemAssignment(index, val) {
+            const trip = getCurrentTrip();
+            if (!trip || !trip.items[index]) return;
+            trip.items[index].assignedTo = val;
             saveToStorage();
             renderItemList();
         }
@@ -877,13 +823,11 @@
             const trip = getCurrentTrip();
             if (!trip) return;
 
-            const baseSym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
-            const localSym = currencySymbols[trip.foreignCurrency || 'SVC'] || '₡';
-            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
+            const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
 
             if (trip.items.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">No custom items added.</p>`;
-                document.getElementById('itemizedTotalSum').innerText = baseSym + '0.00';
+                document.getElementById('itemizedTotalSum').innerText = sym + '0.00';
                 document.getElementById('itemizedPersonBreakdown').innerHTML = '';
                 return;
             }
@@ -891,16 +835,16 @@
             container.innerHTML = trip.items.map((item, idx) => `
                 <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 space-y-2">
                     <div class="flex items-center space-x-2">
-                        <input type="text" placeholder="Item Name (e.g. Tacos)" value="${item.name}" oninput="updateItemData(${idx}, 'name', this.value)" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 px-2.5 focus:outline-none focus:border-indigo-500 text-white font-medium">
+                        <input type="text" placeholder="Item Name" value="${item.name || ''}" oninput="updateItemName(${idx}, this.value)" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 px-2.5 focus:outline-none focus:border-indigo-500 text-white font-medium">
                         <div class="relative w-28">
-                            <span class="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">${localSym}</span>
-                            <input type="number" placeholder="0.00" value="${item.priceLocal || ''}" oninput="updateItemData(${idx}, 'priceLocal', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 pl-7 pr-2 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
+                            <span class="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">${sym}</span>
+                            <input type="number" placeholder="0.00" value="${item.price || ''}" oninput="updateItemPrice(${idx}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 pl-6 pr-2 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
                         </div>
                     </div>
                     <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800">
                         <span class="text-slate-400">Assigned To:</span>
                         <div class="flex items-center space-x-2">
-                            <select onchange="updateItemData(${idx}, 'assignedTo', this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs py-1 px-2 text-slate-300 focus:outline-none">
+                            <select onchange="updateItemAssignment(${idx}, this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs py-1 px-2 text-slate-300 focus:outline-none">
                                 <option value="">Split Evenly</option>
                                 ${trip.participants.map(p => `<option value="${p}" ${item.assignedTo === p ? 'selected' : ''}>${p}</option>`).join('')}
                             </select>
@@ -910,65 +854,52 @@
                 </div>
             `).join('');
 
-            // Calculate Itemized Totals per Person converted to Base Currency silently factoring in the rate
-            let totalsBase = {};
-            trip.participants.forEach(p => totalsBase[p] = 0);
-            let itemTotalLocalSum = 0;
+            let totals = {};
+            trip.participants.forEach(p => totals[p] = 0);
+            let itemTotalSum = 0;
 
             trip.items.forEach(item => {
-                itemTotalLocalSum += (item.priceLocal || 0);
-                const itemBaseVal = (item.priceLocal || 0) / rate;
-                if (item.assignedTo && totalsBase[item.assignedTo] !== undefined) {
-                    totalsBase[item.assignedTo] += itemBaseVal;
+                const pVal = item.price || 0;
+                itemTotalSum += pVal;
+                if (item.assignedTo && totals[item.assignedTo] !== undefined) {
+                    totals[item.assignedTo] += pVal;
                 } else if (trip.participants.length > 0) {
-                    let splitValBase = itemBaseVal / trip.participants.length;
-                    trip.participants.forEach(p => totalsBase[p] += splitValBase);
+                    let splitVal = pVal / trip.participants.length;
+                    trip.participants.forEach(p => totals[p] += splitVal);
                 }
             });
 
-            const totalItemSumBase = itemTotalLocalSum / rate;
-            document.getElementById('itemizedTotalSum').innerText = baseSym + totalItemSumBase.toFixed(2);
+            document.getElementById('itemizedTotalSum').innerText = sym + itemTotalSum.toFixed(2);
 
             const breakdownContainer = document.getElementById('itemizedPersonBreakdown');
-            breakdownContainer.innerHTML = Object.keys(totalsBase).map(p => `
+            breakdownContainer.innerHTML = Object.keys(totals).map(p => `
                 <div class="flex justify-between text-xs bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
                     <span class="text-slate-300 font-medium">${p}</span>
-                    <span class="font-bold text-indigo-400">${baseSym}${totalsBase[p].toFixed(2)}</span>
+                    <span class="font-bold text-indigo-400">${sym}${totals[p].toFixed(2)}</span>
                 </div>
             `).join('');
         }
 
         function saveQuickBillToLog() {
-            const localBill = parseFloat(document.getElementById('billAmount').value) || 0;
-            if (localBill <= 0) {
-                alert('Please enter a valid bill amount in local currency.');
+            const billAmount = parseFloat(document.getElementById('billAmount').value) || 0;
+            if (billAmount <= 0) {
+                alert('Please enter a valid bill amount.');
                 return;
             }
             const trip = getCurrentTrip();
             const title = document.getElementById('billTitle').value.trim() || 'Quick Split Bill';
             const payer = document.getElementById('billPayer').value || (trip.participants[0] || 'Someone');
-            const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
-            const roundUp = document.getElementById('roundUp').checked;
-            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
 
-            const tipAmountLocal = localBill * (tipPct / 100);
-            const taxAmountLocal = localBill * (taxPct / 100);
-            let totalLocalWithExtras = localBill + tipAmountLocal + taxAmountLocal;
-            let localPerPerson = splitCount > 0 ? totalLocalWithExtras / splitCount : 0;
-            if (roundUp && localPerPerson > 0) {
-                localPerPerson = Math.ceil(localPerPerson);
-                totalLocalWithExtras = localPerPerson * splitCount;
-            }
-
-            // Convert total to base currency for expense log & debts
-            const baseTotal = totalLocalWithExtras / rate;
+            const tipAmount = billAmount * (tipPct / 100);
+            const taxAmount = billAmount * (taxPct / 100);
+            const totalWithExtras = billAmount + tipAmount + taxAmount;
 
             trip.expenses.push({
                 id: Date.now(),
                 title: title,
-                total: baseTotal,
+                total: totalWithExtras,
                 payer: payer,
                 date: new Date().toLocaleDateString()
             });
@@ -987,19 +918,17 @@
                 alert('Please add items to itemize.');
                 return;
             }
-            let itemTotalLocalSum = trip.items.reduce((acc, i) => acc + (i.priceLocal || 0), 0);
-            if (itemTotalLocalSum <= 0) {
+            let itemTotalSum = trip.items.reduce((acc, i) => acc + (i.price || 0), 0);
+            if (itemTotalSum <= 0) {
                 alert('Item total must be greater than zero.');
                 return;
             }
             const payer = trip.participants[0] || 'Someone';
-            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
-            const baseTotal = itemTotalLocalSum / rate;
 
             trip.expenses.push({
                 id: Date.now(),
                 title: 'Itemized Receipt',
-                total: baseTotal,
+                total: itemTotalSum,
                 payer: payer,
                 date: new Date().toLocaleDateString()
             });
@@ -1129,20 +1058,6 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
-        }
-
-        function shareSplitSummary() {
-            const trip = getCurrentTrip();
-            const bill = document.getElementById('resultPerPerson').innerText;
-            const total = document.getElementById('resultTotal').innerText;
-            const title = document.getElementById('billTitle').value || 'Group Bill';
-            const text = `WandSplit Summary - ${title}\nTotal Base: ${total}\nPer Person Share: ${bill}`;
-            if (navigator.share) {
-                navigator.share({ title: 'WandSplit', text: text }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(text);
-                alert('Summary copied to clipboard!');
-            }
         }
 
         function resetAllData() {
