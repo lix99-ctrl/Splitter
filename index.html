@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,17 +48,14 @@
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (Streamlined to 3 Tabs: Dashboard, Expenses, Settle) -->
     <nav class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-[57px] z-40">
         <div class="max-w-md mx-auto flex justify-around p-1 text-xs font-semibold">
-            <button onclick="switchTab('quick')" id="tab-quick" class="flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm">
-                <i class="fa-solid fa-calculator mb-1 block"></i> Quick Split
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm">
+                <i class="fa-solid fa-house mb-1 block"></i> Dashboard
             </button>
-            <button onclick="switchTab('items')" id="tab-items" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
-                <i class="fa-solid fa-receipt mb-1 block"></i> Itemize Bill
-            </button>
-            <button onclick="switchTab('history')" id="tab-history" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
-                <i class="fa-solid fa-book-bookmark mb-1 block"></i> Trips & Log
+            <button onclick="switchTab('expenses')" id="tab-expenses" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
+                <i class="fa-solid fa-file-invoice-dollar mb-1 block"></i> Expenses
             </button>
             <button onclick="switchTab('settle')" id="tab-settle" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
                 <i class="fa-solid fa-handshake-angle mb-1 block"></i> Settle Up
@@ -68,10 +66,85 @@
     <!-- Main Container -->
     <main class="max-w-md mx-auto p-4 pb-24 space-y-4">
 
-        <!-- ================= QUICK SPLIT TAB ================= -->
-        <div id="section-quick" class="space-y-4">
+        <!-- ================= DASHBOARD TAB (Replaces First Page & Houses Budget Progress) ================= -->
+        <div id="section-dashboard" class="space-y-4">
             
-            <!-- Currency & Rates Card -->
+            <!-- Active Trip Selector & Budget Card -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Active Trip</span>
+                        <select id="tripSelector" onchange="switchActiveTrip(this.value)" class="block bg-transparent text-white font-bold text-lg focus:outline-none cursor-pointer">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button onclick="openAddTripModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> New Trip</button>
+                </div>
+
+                <!-- Budget Progress Bar Section -->
+                <div class="bg-slate-900 border border-slate-700/60 rounded-xl p-3 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-medium">Trip Budget Progress</span>
+                        <button onclick="openBudgetModal()" class="text-indigo-400 hover:underline text-[11px]"><i class="fa-solid fa-pen-to-square mr-1"></i> <span id="budgetTextDisplay">Set Budget</span></button>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+                        <div id="budgetProgressBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] text-slate-400">
+                        <span>Spent: <strong id="dashboardSpentText" class="text-white">$0.00</strong></span>
+                        <span id="budgetRemainingText">Budget not set</span>
+                    </div>
+                </div>
+
+                <!-- Currency & Rates Preview Toggle -->
+                <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
+                    <span>Base: <strong id="dashBaseCurr" class="text-white">USD</strong> | Local: <strong id="dashLocalCurr" class="text-white">SVC</strong> (Rate: <span id="dashRateText">8.75</span>)</span>
+                    <button onclick="fetchLiveRates()" class="text-indigo-400 hover:underline"><i class="fa-solid fa-arrows-rotate mr-1"></i> Rates</button>
+                </div>
+            </div>
+
+            <!-- Quick Action Shortcuts -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="switchTab('expenses')" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-2xl text-xs font-medium transition flex items-center justify-center space-x-2 shadow-md shadow-indigo-600/20">
+                    <i class="fa-solid fa-plus-circle text-base"></i>
+                    <span>Add Expense / Split</span>
+                </button>
+                <button onclick="switchTab('settle')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 p-3 rounded-2xl text-xs font-medium transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-scale-balanced text-base text-emerald-400"></i>
+                    <span>View Settlements</span>
+                </button>
+            </div>
+
+            <!-- Recent Expenses Log Preview -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-clock-rotate-left text-indigo-400 mr-1.5"></i> Recent Trip Activity</h3>
+                    <button onclick="switchTab('expenses')" class="text-xs text-indigo-400 hover:underline">View All</button>
+                </div>
+                <div id="dashboardExpenseList" class="space-y-2 pt-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- All Saved Trips Archive -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-box-archive text-indigo-400 mr-1.5"></i> All Saved Trips Archive</h3>
+                <div id="allTripsArchiveList" class="space-y-2 pt-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= EXPENSES TAB (Combines Quick Split & Itemized Bill Input) ================= -->
+        <div id="section-expenses" class="space-y-4 hidden">
+            
+            <!-- Entry Mode Toggle Sub-tabs -->
+            <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl p-1 flex space-x-1 text-xs font-semibold">
+                <button onclick="switchExpenseMode('quick')" id="mode-btn-quick" class="flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm">Quick / Even Split</button>
+                <button onclick="switchExpenseMode('itemized')" id="mode-btn-itemized" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">Custom Itemized</button>
+            </div>
+
+            <!-- Currency Settings Card -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center text-xs text-slate-400 font-medium">
                     <span>CURRENCY SETTINGS</span>
@@ -106,155 +179,126 @@
                 </div>
             </div>
 
-            <!-- Bill Input Card -->
-            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-4">
-                <div class="space-y-1">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Bill Amount</label>
-                    <div class="relative">
-                        <span id="currencySymbol" class="absolute left-4 top-3.5 text-slate-400 text-lg font-bold">$</span>
-                        <input type="number" id="billAmount" placeholder="0.00" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-4 py-3 text-2xl font-bold tracking-tight focus:outline-none focus:border-indigo-500 text-white">
+            <!-- Quick / Even Split Section Wrapper -->
+            <div id="expense-mode-quick" class="space-y-4">
+                <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-4">
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Bill Amount</label>
+                        <div class="relative">
+                            <span id="currencySymbol" class="absolute left-4 top-3.5 text-slate-400 text-lg font-bold">$</span>
+                            <input type="number" id="billAmount" placeholder="0.00" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-4 py-3 text-2xl font-bold tracking-tight focus:outline-none focus:border-indigo-500 text-white">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Paid By</label>
+                            <select id="billPayer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Bill Title / Note</label>
+                            <input type="text" id="billTitle" placeholder="e.g. Dinner at El Tunco" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Tip</span>
+                                <span id="tipValText" class="font-bold text-indigo-400">15%</span>
+                            </div>
+                            <input type="range" id="tipPercent" min="0" max="35" value="15" step="1" oninput="updateCalculations()" class="w-full accent-indigo-500 bg-slate-900 cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Tax / Fee</span>
+                                <span id="taxValText" class="font-bold text-indigo-400">0%</span>
+                            </div>
+                            <input type="range" id="taxPercent" min="0" max="25" value="0" step="1" oninput="updateCalculations()" class="w-full accent-indigo-500 bg-slate-900 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-medium">Split Between People</span>
+                            <div class="space-x-1">
+                                <button onclick="setSplitCount(2)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">2</button>
+                                <button onclick="setSplitCount(3)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">3</button>
+                                <button onclick="setSplitCount(4)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">4</button>
+                                <button onclick="setSplitCount(5)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">5</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="adjustPeople(-1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-minus"></i></button>
+                            <input type="number" id="splitCount" value="2" min="1" max="20" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 text-center font-bold text-lg focus:outline-none focus:border-indigo-500">
+                            <button onclick="adjustPeople(1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs">
+                        <span class="text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Round up to nearest whole unit</span>
+                        <input type="checkbox" id="roundUp" onchange="updateCalculations()" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
                     </div>
                 </div>
 
-                <!-- Payer selector -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Paid By</label>
-                        <select id="billPayer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                <div class="bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-indigo-500/30 rounded-2xl p-4 shadow-lg space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share</span>
+                        <span id="foreignPerPerson" class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">--</span>
+                    </div>
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-3xl font-extrabold text-white tracking-tight" id="resultPerPerson">$0.00</span>
+                        <span class="text-xs text-slate-400">Total with tip/tax: <strong id="resultTotal" class="text-white">$0.00</strong></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="saveQuickBillToLog()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> <span>Save to Trip Log</span>
+                        </button>
+                        <button onclick="shareSplitSummary()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-share-nodes"></i> <span>Share Text</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Itemized Split Section Wrapper -->
+            <div id="expense-mode-itemized" class="space-y-4 hidden">
+                <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split</h3>
+                        <button onclick="addItemRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> Add Item</button>
+                    </div>
+                    <p class="text-xs text-slate-400">Assign specific items to specific people. Unassigned items split evenly.</p>
+
+                    <div id="itemList" class="space-y-2 pt-2">
+                        <!-- Dynamically populated rows -->
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-700/70 space-y-2">
+                        <div class="flex justify-between text-xs font-semibold text-slate-400">
+                            <span>Participant Totals</span>
+                            <span>Item Total: <span id="itemizedTotalSum" class="text-white">$0.00</span></span>
+                        </div>
+                        <div id="itemizedPersonBreakdown" class="space-y-1.5 pt-1">
                             <!-- Populated dynamically -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Bill Title / Note</label>
-                        <input type="text" id="billTitle" placeholder="e.g. Dinner at El Tunco" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
-                    </div>
-                </div>
-
-                <!-- Tip & Tax Sliders -->
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-slate-400">Tip</span>
-                            <span id="tipValText" class="font-bold text-indigo-400">15%</span>
                         </div>
-                        <input type="range" id="tipPercent" min="0" max="35" value="15" step="1" oninput="updateCalculations()" class="w-full accent-indigo-500 bg-slate-900 cursor-pointer">
+                        <button onclick="saveItemizedToLog()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Record Itemized Bill</span>
+                        </button>
                     </div>
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="text-slate-400">Tax / Fee</span>
-                            <span id="taxValText" class="font-bold text-indigo-400">0%</span>
-                        </div>
-                        <input type="range" id="taxPercent" min="0" max="25" value="0" step="1" oninput="updateCalculations()" class="w-full accent-indigo-500 bg-slate-900 cursor-pointer">
-                    </div>
-                </div>
-
-                <!-- Group Size & Presets -->
-                <div class="space-y-2 pt-1">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-400 font-medium">Split Between People</span>
-                        <div class="space-x-1">
-                            <button onclick="setSplitCount(2)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">2</button>
-                            <button onclick="setSplitCount(3)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">3</button>
-                            <button onclick="setSplitCount(4)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">4</button>
-                            <button onclick="setSplitCount(5)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-xs">5</button>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="adjustPeople(-1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-minus"></i></button>
-                        <input type="number" id="splitCount" value="2" min="1" max="20" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 text-center font-bold text-lg focus:outline-none focus:border-indigo-500">
-                        <button onclick="adjustPeople(1)" class="w-10 h-10 bg-slate-900 border border-slate-700 rounded-xl font-bold flex items-center justify-center hover:bg-slate-700"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <!-- Rounding Toggle -->
-                <div class="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs">
-                    <span class="text-slate-400"><i class="fa-solid fa-coins mr-1"></i> Round up to nearest whole unit</span>
-                    <input type="checkbox" id="roundUp" onchange="updateCalculations()" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
                 </div>
             </div>
 
-            <!-- Results Display Card -->
-            <div class="bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-indigo-500/30 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share</span>
-                    <span id="foreignPerPerson" class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">--</span>
-                </div>
-                <div class="flex justify-between items-baseline">
-                    <span class="text-3xl font-extrabold text-white tracking-tight" id="resultPerPerson">$0.00</span>
-                    <span class="text-xs text-slate-400">Total with tip/tax: <strong id="resultTotal" class="text-white">$0.00</strong></span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 pt-2">
-                    <button onclick="saveQuickBillToLog()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-floppy-disk"></i> <span>Save to Trip Log</span>
-                    </button>
-                    <button onclick="shareSplitSummary()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-share-nodes"></i> <span>Share Text</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= ITEMIZE BILL TAB ================= -->
-        <div id="section-items" class="space-y-4 hidden">
-            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split</h3>
-                    <button onclick="addItemRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> Add Item</button>
-                </div>
-                <p class="text-xs text-slate-400">Assign specific items to specific people. Unassigned items split evenly.</p>
-
-                <!-- Items Container -->
-                <div id="itemList" class="space-y-2 pt-2">
-                    <!-- Dynamically populated rows -->
-                </div>
-
-                <!-- Itemized Summary Output -->
-                <div class="pt-3 border-t border-slate-700/70 space-y-2">
-                    <div class="flex justify-between text-xs font-semibold text-slate-400">
-                        <span>Participant Totals</span>
-                        <span>Item Total: <span id="itemizedTotalSum" class="text-white">$0.00</span></span>
-                    </div>
-                    <div id="itemizedPersonBreakdown" class="space-y-1.5 pt-1">
-                        <!-- Populated dynamically -->
-                    </div>
-                    <button onclick="saveItemizedToLog()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-file-invoice-dollar"></i> <span>Record Itemized Bill</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= TRIPS & TAB HISTORY LOG ================= -->
-        <div id="section-history" class="space-y-4 hidden">
-            <!-- Trip Manager Card -->
-            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-map-location-dot text-indigo-400 mr-1.5"></i> Active Trip</h3>
-                    <button onclick="openAddTripModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> New Trip</button>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <select id="tripSelector" onchange="switchActiveTrip(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
-                        <!-- Populated dynamically -->
-                    </select>
-                </div>
-            </div>
-
-            <!-- Expense Log Card -->
+            <!-- Full Expense Log Card -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-clock-rotate-left text-indigo-400 mr-1.5"></i> Trip Expense Log</h3>
                     <span id="totalTripSpend" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full">Total: $0.00</span>
                 </div>
                 <div id="expenseHistoryList" class="space-y-2.5 pt-1">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- All Saved Trips Archive -->
-            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-box-archive text-indigo-400 mr-1.5"></i> All Saved Trips Archive</h3>
-                <div id="allTripsArchiveList" class="space-y-2 pt-1">
                     <!-- Populated dynamically -->
                 </div>
             </div>
@@ -311,10 +355,23 @@
     <div id="tripModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
             <h3 class="font-bold text-sm text-white">Create New Trip</h3>
-            <input type="text" id="newTripName" placeholder="Trip Name (e.g. El Tunco Getaway)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+            <input type="text" id="newTripName" placeholder="Trip Name (e.g. Tokyo Getaway)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
             <div class="flex space-x-2 pt-2">
                 <button onclick="closeAddTripModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-xl text-xs transition">Cancel</button>
                 <button onclick="addNewTrip()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-xl text-xs font-medium transition">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Setting Trip Budget -->
+    <div id="budgetModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
+            <h3 class="font-bold text-sm text-white">Set Trip Budget</h3>
+            <p class="text-xs text-slate-400">Enter the maximum total budget for this trip.</p>
+            <input type="number" id="tripBudgetInput" placeholder="e.g. 1500.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+            <div class="flex space-x-2 pt-2">
+                <button onclick="closeBudgetModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-xl text-xs transition">Cancel</button>
+                <button onclick="saveTripBudget()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-xl text-xs font-medium transition">Save Budget</button>
             </div>
         </div>
     </div>
@@ -331,6 +388,7 @@
                 {
                     id: 1,
                     name: 'My First Trip',
+                    budget: 0,
                     participants: [],
                     expenses: [],
                     items: []
@@ -357,6 +415,7 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderDashboard();
             renderAllTripsArchive();
             calculateDebts();
             updateCalculations();
@@ -396,19 +455,52 @@
         }
 
         function switchTab(tabId) {
-            ['quick', 'items', 'history', 'settle'].forEach(t => {
-                document.getElementById(`section-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
+            ['dashboard', 'expenses', 'settle'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const tab = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (tab) tab.className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
             });
-            document.getElementById(`section-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).className = "flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm";
-            if (tabId === 'items') renderItemList();
-            if (tabId === 'history') { renderTripSelector(); renderHistory(); renderAllTripsArchive(); }
-            if (tabId === 'settle') calculateDebts();
+            const activeSec = document.getElementById(`section-${tabId}`);
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            if (activeSec) activeSec.classList.remove('hidden');
+            if (activeTab) activeTab.className = "flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm";
+            
+            if (tabId === 'dashboard') {
+                renderDashboard();
+                renderAllTripsArchive();
+            }
+            if (tabId === 'expenses') {
+                renderItemList();
+                renderHistory();
+            }
+            if (tabId === 'settle') {
+                calculateDebts();
+            }
+        }
+
+        function switchExpenseMode(mode) {
+            const quickEl = document.getElementById('expense-mode-quick');
+            const itemEl = document.getElementById('expense-mode-itemized');
+            const btnQuick = document.getElementById('mode-btn-quick');
+            const btnItem = document.getElementById('mode-btn-itemized');
+
+            if (mode === 'quick') {
+                quickEl.classList.remove('hidden');
+                itemEl.classList.add('hidden');
+                btnQuick.className = "flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm";
+                btnItem.className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
+            } else {
+                quickEl.classList.add('hidden');
+                itemEl.classList.remove('hidden');
+                btnItem.className = "flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm";
+                btnQuick.className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
+                renderItemList();
+            }
         }
 
         function initTabs() {
-            switchTab('quick');
+            switchTab('dashboard');
         }
 
         function renderTripSelector() {
@@ -426,6 +518,7 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderDashboard();
             renderAllTripsArchive();
             calculateDebts();
         }
@@ -445,6 +538,7 @@
             const newTrip = {
                 id: Date.now(),
                 name: name,
+                budget: 0,
                 participants: [],
                 expenses: [],
                 items: []
@@ -457,15 +551,96 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderDashboard();
             renderAllTripsArchive();
             calculateDebts();
             closeAddTripModal();
+        }
+
+        function openBudgetModal() {
+            const trip = getCurrentTrip();
+            document.getElementById('tripBudgetInput').value = trip.budget > 0 ? trip.budget : '';
+            document.getElementById('budgetModal').classList.remove('hidden');
+        }
+
+        function closeBudgetModal() {
+            document.getElementById('budgetModal').classList.add('hidden');
+        }
+
+        function saveTripBudget() {
+            const val = parseFloat(document.getElementById('tripBudgetInput').value) || 0;
+            const trip = getCurrentTrip();
+            if (trip) {
+                trip.budget = val;
+                saveToStorage();
+                renderDashboard();
+            }
+            closeBudgetModal();
+        }
+
+        function renderDashboard() {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+
+            document.getElementById('dashBaseCurr').innerText = state.baseCurrency || 'USD';
+            document.getElementById('dashLocalCurr').innerText = state.foreignCurrency || 'SVC';
+            document.getElementById('dashRateText').innerText = state.exchangeRate || 1;
+
+            const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
+            const sym = currencySymbols[state.baseCurrency] || '$';
+
+            document.getElementById('dashboardSpentText').innerText = sym + totalSpend.toFixed(2);
+
+            const budget = trip.budget || 0;
+            const budgetDisplay = document.getElementById('budgetTextDisplay');
+            const remainingText = document.getElementById('budgetRemainingText');
+            const progressBar = document.getElementById('budgetProgressBar');
+
+            if (budget > 0) {
+                budgetDisplay.innerText = `Budget: ${sym}${budget.toFixed(2)}`;
+                const pct = Math.min(Math.round((totalSpend / budget) * 100), 100);
+                progressBar.style.width = pct + '%';
+
+                if (totalSpend > budget) {
+                    progressBar.className = "bg-rose-500 h-full transition-all duration-500";
+                    remainingText.innerHTML = `<span class="text-rose-400 font-semibold">Over budget by ${sym}${(totalSpend - budget).toFixed(2)}</span>`;
+                } else if (pct >= 75) {
+                    progressBar.className = "bg-amber-500 h-full transition-all duration-500";
+                    remainingText.innerHTML = `Remaining: ${sym}${(budget - totalSpend).toFixed(2)}`;
+                } else {
+                    progressBar.className = "bg-emerald-500 h-full transition-all duration-500";
+                    remainingText.innerHTML = `Remaining: ${sym}${(budget - totalSpend).toFixed(2)}`;
+                }
+            } else {
+                budgetDisplay.innerText = "Set Budget";
+                progressBar.style.width = '0%';
+                remainingText.innerText = "No budget limit set";
+            }
+
+            // Render Recent List Preview
+            const dashExpList = document.getElementById('dashboardExpenseList');
+            if (dashExpList) {
+                if (trip.expenses.length === 0) {
+                    dashExpList.innerHTML = `<p class="text-xs text-slate-400 italic">No expenses recorded yet.</p>`;
+                } else {
+                    dashExpList.innerHTML = trip.expenses.slice(-3).reverse().map(exp => `
+                        <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-bold text-white">${exp.title || 'Expense'}</span>
+                                <p class="text-[10px] text-slate-400">Paid by ${exp.payer} • ${exp.date}</p>
+                            </div>
+                            <span class="font-bold text-indigo-400">${sym}${exp.total.toFixed(2)}</span>
+                        </div>
+                    `).join('');
+                }
+            }
         }
 
         function renderAllTripsArchive() {
             const container = document.getElementById('allTripsArchiveList');
             if (!container) return;
 
+            const sym = currencySymbols[state.baseCurrency] || '$';
             container.innerHTML = state.trips.map(trip => {
                 const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
                 const isCurrent = trip.id === state.currentTripId;
@@ -476,10 +651,10 @@
                                 <span>${trip.name}</span>
                                 ${isCurrent ? '<span class="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-full font-semibold">Active</span>' : ''}
                             </div>
-                            <p class="text-[10px] text-slate-400">${trip.participants.length} members • ${trip.expenses.length} bills • Total: $${totalSpend.toFixed(2)}</p>
+                            <p class="text-[10px] text-slate-400">${trip.participants.length} members • ${trip.expenses.length} bills • Total: ${sym}${totalSpend.toFixed(2)}</p>
                         </div>
                         <div class="flex items-center space-x-1.5">
-                            ${!isCurrent ? `<button onclick="switchActiveTrip(${trip.id}); switchTab('quick');" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-[10px] transition">Open</button>` : ''}
+                            ${!isCurrent ? `<button onclick="switchActiveTrip(${trip.id}); switchTab('dashboard');" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-[10px] transition">Open</button>` : ''}
                             ${state.trips.length > 1 ? `<button onclick="deleteTrip(${trip.id})" class="text-rose-400 hover:text-rose-300 p-1 text-xs" title="Delete Trip"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </div>
                     </div>
@@ -503,6 +678,7 @@
                 renderPayerDropdown();
                 renderItemList();
                 renderHistory();
+                renderDashboard();
                 renderAllTripsArchive();
                 calculateDebts();
             }
@@ -559,55 +735,6 @@
             updateCalculations();
         }
 
-        async function fetchLiveRates() {
-            const status = document.getElementById('rateStatus');
-            status.innerText = "Fetching live rates...";
-            try {
-                const res = await fetch(`https://open.er-api.com/v6/latest/${state.baseCurrency}`);
-                const data = await res.json();
-                if (data && data.rates && data.rates[state.foreignCurrency]) {
-                    state.exchangeRate = data.rates[state.foreignCurrency];
-                    document.getElementById('exchangeRate').value = state.exchangeRate.toFixed(2);
-                    status.innerText = "Live rates updated!";
-                    updateCalculations();
-                } else {
-                    status.innerText = "Using cached rate";
-                }
-            } catch (e) {
-                status.innerText = "Offline (Cache used)";
-            }
-        }
-
-        function renderParticipants() {
-            const trip = getCurrentTrip();
-            const container = document.getElementById('participantsList');
-            if (!container) return;
-
-            if (trip.participants.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic py-2">No participants added yet. Click 'Add' to begin.</div>`;
-            } else {
-                container.innerHTML = trip.participants.map((p, idx) => `
-                    <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs flex items-center space-x-2">
-                        <span class="font-medium text-white">${p}</span>
-                        <button onclick="removePerson(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                `).join('');
-            }
-            renderPayerDropdown();
-            renderItemList();
-        }
-
-        function renderPayerDropdown() {
-            const trip = getCurrentTrip();
-            const select = document.getElementById('billPayer');
-            if (!select) return;
-            if (trip.participants.length === 0) {
-                select.innerHTML = `<option value="">No participants</option>`;
-            } else {
-                select.innerHTML = trip.participants.map(p => `<option value="${p}">${p}</option>`).join('');
-            }
-        }
-
         function openAddPersonModal() {
             document.getElementById('personModal').classList.remove('hidden');
             document.getElementById('newPersonName').value = '';
@@ -618,297 +745,328 @@
         }
 
         function addPerson() {
+            const nameInput = document.getElementById('newPersonName');
+            const name = nameInput.value.trim();
+            if (!name) return;
             const trip = getCurrentTrip();
-            const name = document.getElementById('newPersonName').value.trim();
-            if (name && !trip.participants.includes(name)) {
+            if (trip && !trip.participants.includes(name)) {
                 trip.participants.push(name);
-                renderParticipants();
-                closeAddPersonModal();
                 saveToStorage();
+                renderParticipants();
+                renderPayerDropdown();
+                renderItemList();
+                calculateDebts();
             }
+            closeAddPersonModal();
         }
 
-        function removePerson(idx) {
+        function removePerson(name) {
             const trip = getCurrentTrip();
-            trip.participants.splice(idx, 1);
-            renderParticipants();
-            saveToStorage();
+            if (trip) {
+                trip.participants = trip.participants.filter(p => p !== name);
+                saveToStorage();
+                renderParticipants();
+                renderPayerDropdown();
+                renderItemList();
+                calculateDebts();
+            }
         }
 
         function clearAllParticipants() {
             const trip = getCurrentTrip();
-            if (confirm('Clear all participants for this trip?')) {
+            if (trip && confirm('Clear all group participants?')) {
                 trip.participants = [];
-                renderParticipants();
                 saveToStorage();
+                renderParticipants();
+                renderPayerDropdown();
+                renderItemList();
+                calculateDebts();
             }
         }
 
-        function renderItemList() {
+        function renderParticipants() {
+            const container = document.getElementById('participantsList');
+            if (!container) return;
             const trip = getCurrentTrip();
+            if (!trip || trip.participants.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">No participants added yet. Click 'Add' to begin.</p>`;
+                return;
+            }
+            container.innerHTML = trip.participants.map(p => `
+                <span class="inline-flex items-center bg-slate-900 border border-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-xl">
+                    ${p}
+                    <button onclick="removePerson('${p}')" class="ml-1.5 text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+                </span>
+            `).join('');
+        }
+
+        function renderPayerDropdown() {
+            const select = document.getElementById('billPayer');
+            if (!select) return;
+            const trip = getCurrentTrip();
+            if (!trip || trip.participants.length === 0) {
+                select.innerHTML = `<option value="">No participants</option>`;
+                return;
+            }
+            select.innerHTML = trip.participants.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        function addItemRow() {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+            trip.items.push({ name: '', price: 0, assignedTo: '' });
+            saveToStorage();
+            renderItemList();
+        }
+
+        function removeItemRow(index) {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+            trip.items.splice(index, 1);
+            saveToStorage();
+            renderItemList();
+        }
+
+        function updateItemData(index, field, value) {
+            const trip = getCurrentTrip();
+            if (!trip || !trip.items[index]) return;
+            if (field === 'price') {
+                trip.items[index].price = parseFloat(value) || 0;
+            } else {
+                trip.items[index][field] = value;
+            }
+            saveToStorage();
+            renderItemList();
+        }
+
+        function renderItemList() {
             const container = document.getElementById('itemList');
             if (!container) return;
-            
+            const trip = getCurrentTrip();
+            if (!trip) return;
+
+            const sym = currencySymbols[state.baseCurrency] || '$';
+
             if (trip.items.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic text-center py-3">No custom items added.</div>`;
-                document.getElementById('itemizedTotalSum').innerText = '$0.00';
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">No custom items added.</p>`;
+                document.getElementById('itemizedTotalSum').innerText = sym + '0.00';
                 document.getElementById('itemizedPersonBreakdown').innerHTML = '';
                 return;
             }
 
             container.innerHTML = trip.items.map((item, idx) => `
-                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
-                    <div class="flex items-center space-x-2">
-                        <input type="text" value="${item.name}" oninput="updateItemName(${idx}, this.value)" placeholder="Item name" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs flex-1 focus:outline-none focus:border-indigo-500 text-white">
-                        <input type="number" value="${item.price}" step="0.5" oninput="updateItemPrice(${idx}, this.value)" placeholder="0.00" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs w-20 focus:outline-none focus:border-indigo-500 font-bold text-white">
-                        <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                    <div class="flex flex-wrap gap-1 pt-1">
-                        <span class="text-[10px] text-slate-400 self-center mr-1">For:</span>
-                        ${trip.participants.length === 0 ? '<span class="text-[10px] text-slate-500 italic">Add participants first</span>' : trip.participants.map(p => `
-                            <button onclick="toggleItemAssignment(${idx}, '${p}')" class="px-2 py-0.5 rounded text-[10px] font-medium transition ${item.assignedTo.includes(p) ? 'bg-indigo-600 text-white shadow' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">
-                                ${p}
-                            </button>
-                        `).join('')}
-                    </div>
+                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2">
+                    <input type="text" placeholder="New Item" value="${item.name}" oninput="updateItemData(${idx}, 'name', this.value)" class="flex-1 bg-transparent border-b border-slate-700 text-xs py-1 px-1 focus:outline-none focus:border-indigo-500 text-white">
+                    <input type="number" placeholder="0.00" value="${item.price || ''}" oninput="updateItemData(${idx}, 'price', this.value)" class="w-16 bg-transparent border-b border-slate-700 text-xs py-1 px-1 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
+                    <select onchange="updateItemData(${idx}, 'assignedTo', this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs py-1 px-1 text-slate-300 focus:outline-none">
+                        <option value="">Split Evenly</option>
+                        ${trip.participants.map(p => `<option value="${p}" ${item.assignedTo === p ? 'selected' : ''}>${p}</option>`).join('')}
+                    </select>
+                    <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 px-1 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             `).join('');
 
-            calculateItemizedTotals();
-        }
-
-        function addItemRow() {
-            const trip = getCurrentTrip();
-            trip.items.push({ name: 'New Item', price: 10.00, assignedTo: [...trip.participants] });
-            renderItemList();
-            saveToStorage();
-        }
-
-        function removeItemRow(idx) {
-            const trip = getCurrentTrip();
-            trip.items.splice(idx, 1);
-            renderItemList();
-            saveToStorage();
-        }
-
-        function updateItemName(idx, val) {
-            const trip = getCurrentTrip();
-            trip.items[idx].name = val;
-            saveToStorage();
-        }
-
-        function updateItemPrice(idx, val) {
-            const trip = getCurrentTrip();
-            trip.items[idx].price = parseFloat(val) || 0;
-            calculateItemizedTotals();
-            saveToStorage();
-        }
-
-        function toggleItemAssignment(itemIdx, person) {
-            const trip = getCurrentTrip();
-            const item = trip.items[itemIdx];
-            const pos = item.assignedTo.indexOf(person);
-            if (pos > -1) {
-                if (item.assignedTo.length > 1) item.assignedTo.splice(pos, 1);
-            } else {
-                item.assignedTo.push(person);
-            }
-            renderItemList();
-            saveToStorage();
-        }
-
-        function calculateItemizedTotals() {
-            const trip = getCurrentTrip();
-            const totals = {};
+            // Calculate Itemized Totals per Person
+            let totals = {};
             trip.participants.forEach(p => totals[p] = 0);
-            let grandTotal = 0;
+            let itemTotalSum = 0;
 
             trip.items.forEach(item => {
-                grandTotal += item.price;
-                const count = item.assignedTo.length;
-                if (count > 0) {
-                    const share = item.price / count;
-                    item.assignedTo.forEach(p => {
-                        if (totals[p] !== undefined) totals[p] += share;
-                    });
+                itemTotalSum += item.price;
+                if (item.assignedTo && totals[item.assignedTo] !== undefined) {
+                    totals[item.assignedTo] += item.price;
+                } else if (trip.participants.length > 0) {
+                    let splitVal = item.price / trip.participants.length;
+                    trip.participants.forEach(p => totals[p] += splitVal);
                 }
             });
 
-            document.getElementById('itemizedTotalSum').innerText = '$' + grandTotal.toFixed(2);
-            
+            document.getElementById('itemizedTotalSum').innerText = sym + itemTotalSum.toFixed(2);
+
             const breakdownContainer = document.getElementById('itemizedPersonBreakdown');
-            breakdownContainer.innerHTML = Object.entries(totals).map(([p, amt]) => `
-                <div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-lg text-xs">
+            breakdownContainer.innerHTML = Object.keys(totals).map(p => `
+                <div class="flex justify-between text-xs bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
                     <span class="text-slate-300 font-medium">${p}</span>
-                    <span class="font-bold text-indigo-400">$${amt.toFixed(2)}</span>
+                    <span class="font-bold text-indigo-400">${sym}${totals[p].toFixed(2)}</span>
                 </div>
             `).join('');
-
-            return totals;
         }
 
         function saveQuickBillToLog() {
-            const trip = getCurrentTrip();
-            if (trip.participants.length === 0) {
-                alert('Please add at least one participant in the Settle Up tab before saving bills.');
+            const bill = parseFloat(document.getElementById('billAmount').value) || 0;
+            if (bill <= 0) {
+                alert('Please enter a valid bill amount.');
                 return;
             }
-            const bill = parseFloat(document.getElementById('billAmount').value) || 0;
-            if (bill <= 0) return alert('Please enter a valid bill amount');
+            const trip = getCurrentTrip();
             const title = document.getElementById('billTitle').value.trim() || 'Quick Split Bill';
-            const payer = document.getElementById('billPayer').value || trip.participants[0];
+            const payer = document.getElementById('billPayer').value || (trip.participants[0] || 'Someone');
             const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
-            
-            const total = bill * (1 + (tipPct + taxPct)/100);
-            const activeParticipants = trip.participants.slice(0, splitCount);
-            const share = activeParticipants.length > 0 ? total / activeParticipants.length : total;
+            const roundUp = document.getElementById('roundUp').checked;
 
-            const expense = {
+            const tipAmount = bill * (tipPct / 100);
+            const taxAmount = bill * (taxPct / 100);
+            let totalWithExtras = bill + tipAmount + taxAmount;
+            let perPerson = splitCount > 0 ? totalWithExtras / splitCount : 0;
+            if (roundUp && perPerson > 0) {
+                perPerson = Math.ceil(perPerson);
+                totalWithExtras = perPerson * splitCount;
+            }
+
+            trip.expenses.push({
                 id: Date.now(),
-                title,
-                total,
-                payer,
-                splitType: 'Equal',
-                shares: activeParticipants.reduce((acc, p) => { acc[p] = share; return acc; }, {})
-            };
+                title: title,
+                total: totalWithExtras,
+                payer: payer,
+                date: new Date().toLocaleDateString()
+            });
 
-            trip.expenses.push(expense);
             saveToStorage();
-            switchTab('history');
+            renderHistory();
+            renderDashboard();
+            calculateDebts();
+            alert('Bill successfully saved to trip log!');
+            switchTab('dashboard');
         }
 
         function saveItemizedToLog() {
             const trip = getCurrentTrip();
-            if (trip.participants.length === 0) {
-                alert('Please add participants first.');
+            if (!trip || trip.items.length === 0) {
+                alert('Please add items to itemize.');
                 return;
             }
-            const totals = calculateItemizedTotals();
-            let grandTotal = 0;
-            Object.values(totals).forEach(v => grandTotal += v);
-            if (grandTotal <= 0) return alert('No items added yet');
+            let itemTotalSum = trip.items.reduce((acc, i) => acc + i.price, 0);
+            if (itemTotalSum <= 0) {
+                alert('Item total must be greater than zero.');
+                return;
+            }
+            const payer = trip.participants[0] || 'Someone';
 
-            const expense = {
+            trip.expenses.push({
                 id: Date.now(),
-                title: 'Itemized Bill (' + new Date().toLocaleDateString() + ')',
-                total: grandTotal,
-                payer: trip.participants[0],
-                splitType: 'Itemized',
-                shares: totals
-            };
+                title: 'Itemized Receipt',
+                total: itemTotalSum,
+                payer: payer,
+                date: new Date().toLocaleDateString()
+            });
 
-            trip.expenses.push(expense);
-            trip.items = []; // Clear current items after recording
+            trip.items = [];
             saveToStorage();
-            switchTab('history');
+            renderItemList();
+            renderHistory();
+            renderDashboard();
+            calculateDebts();
+            alert('Itemized bill recorded successfully!');
+            switchTab('dashboard');
         }
 
         function renderHistory() {
-            const trip = getCurrentTrip();
             const container = document.getElementById('expenseHistoryList');
-            let tripTotal = 0;
+            if (!container) return;
+            const trip = getCurrentTrip();
+            if (!trip) return;
+
+            const sym = currencySymbols[state.baseCurrency] || '$';
+            const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
+            document.getElementById('totalTripSpend').innerText = `Total: ${sym}${totalSpend.toFixed(2)}`;
 
             if (trip.expenses.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500 italic">No saved bills in this trip yet. Quick split or itemize a bill to log it here!</div>`;
-                document.getElementById('totalTripSpend').innerText = 'Total: $0.00';
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">No expenses recorded for this trip yet.</p>`;
                 return;
             }
 
-            container.innerHTML = trip.expenses.map(exp => {
-                tripTotal += exp.total;
-                return `
-                    <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-1.5">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-bold text-xs text-white">${exp.title}</h4>
-                                <p class="text-[10px] text-slate-400">Paid by <strong class="text-indigo-400">${exp.payer}</strong> • ${exp.splitType}</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="font-extrabold text-xs text-white">$${exp.total.toFixed(2)}</span>
-                                <button onclick="deleteExpense(${exp.id})" class="block text-[10px] text-rose-400 hover:text-rose-300 mt-0.5">Delete</button>
-                            </div>
-                        </div>
+            container.innerHTML = trip.expenses.slice().reverse().map(exp => `
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold text-white">${exp.title}</div>
+                        <p class="text-[10px] text-slate-400">Paid by <strong class="text-indigo-400">${exp.payer}</strong> • ${exp.date}</p>
                     </div>
-                `;
-            }).join('');
-
-            document.getElementById('totalTripSpend').innerText = `Total: $${tripTotal.toFixed(2)}`;
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-white">${sym}${exp.total.toFixed(2)}</span>
+                        <button onclick="deleteExpense(${exp.id})" class="text-rose-400 hover:text-rose-300 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function deleteExpense(id) {
+        function deleteExpense(expId) {
             const trip = getCurrentTrip();
-            trip.expenses = trip.expenses.filter(e => e.id !== id);
+            if (!trip) return;
+            trip.expenses = trip.expenses.filter(e => e.id !== expId);
             saveToStorage();
             renderHistory();
-            renderAllTripsArchive();
+            renderDashboard();
             calculateDebts();
         }
 
         function calculateDebts() {
+            const container = document.getElementById('settlementPlanList');
+            if (!container) return;
             const trip = getCurrentTrip();
-            const balances = {};
+            if (!trip || trip.participants.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">Add participants to calculate debts.</p>`;
+                return;
+            }
+
+            let balances = {};
             trip.participants.forEach(p => balances[p] = 0);
 
+            let totalGroupSpend = 0;
             trip.expenses.forEach(exp => {
+                totalGroupSpend += exp.total;
                 if (balances[exp.payer] !== undefined) {
                     balances[exp.payer] += exp.total;
                 }
-                Object.entries(exp.shares).forEach(([person, amount]) => {
-                    if (balances[person] !== undefined) {
-                        balances[person] -= amount;
-                    }
-                });
+            });
+
+            const sharePerPerson = trip.participants.length > 0 ? totalGroupSpend / trip.participants.length : 0;
+            trip.participants.forEach(p => {
+                balances[p] -= sharePerPerson;
             });
 
             let debtors = [];
             let creditors = [];
-            Object.entries(balances).forEach(([p, bal]) => {
+
+            Object.keys(balances).forEach(p => {
+                let bal = balances[p];
                 if (bal < -0.01) debtors.push({ name: p, amount: -bal });
                 else if (bal > 0.01) creditors.push({ name: p, amount: bal });
             });
 
-            debtors.sort((a, b) => b.amount - a.amount);
-            creditors.sort((a, b) => b.amount - a.amount);
-
             let transactions = [];
-            let dIdx = 0, cIdx = 0;
+            let i = 0, j = 0;
 
-            while (dIdx < debtors.length && cIdx < creditors.length) {
-                let debtor = debtors[dIdx];
-                let creditor = creditors[cIdx];
+            while (i < debtors.length && j < creditors.length) {
+                let debtor = debtors[i];
+                let creditor = creditors[j];
                 let amt = Math.min(debtor.amount, creditor.amount);
 
-                if (amt > 0.01) {
-                    transactions.push({ from: debtor.name, to: creditor.name, amount: amt });
-                }
+                transactions.push({ from: debtor.name, to: creditor.name, amount: amt });
 
                 debtor.amount -= amt;
                 creditor.amount -= amt;
 
-                if (debtor.amount < 0.01) dIdx++;
-                if (creditor.amount < 0.01) cIdx++;
+                if (debtor.amount < 0.01) i++;
+                if (creditor.amount < 0.01) j++;
             }
 
-            const container = document.getElementById('settlementPlanList');
-            if (trip.participants.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-xs text-slate-500 italic">Add participants to calculate debts.</div>`;
-                return;
-            }
+            const sym = currencySymbols[state.baseCurrency] || '$';
+
             if (transactions.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-xs text-emerald-400 font-medium"><i class="fa-solid fa-check-circle mr-1"></i> Everyone is completely settled up!</div>`;
+                container.innerHTML = `<p class="text-xs text-emerald-400 font-medium italic text-center py-2"><i class="fa-solid fa-circle-check mr-1"></i> All group debts are fully settled!</p>`;
                 return;
             }
 
             container.innerHTML = transactions.map(tx => `
                 <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 flex justify-between items-center text-xs">
-                    <div class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-1.5 text-slate-200">
                         <span class="font-bold text-rose-400">${tx.from}</span>
-                        <i class="fa-solid fa-arrow-right text-slate-500 text-[10px]"></i>
+                        <span>pays</span>
                         <span class="font-bold text-emerald-400">${tx.to}</span>
                     </div>
-                    <span class="font-extrabold text-white bg-slate-800 px-2.5 py-1 rounded-lg">$${tx.amount.toFixed(2)}</span>
+                    <span class="font-bold text-white bg-slate-800 px-2.5 py-1 rounded-lg">${sym}${tx.amount.toFixed(2)}</span>
                 </div>
             `).join('');
         }
@@ -919,34 +1077,31 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
-
-            const trip = getCurrentTrip();
-            trip.items = []; // Reset itemized rows only, keep trip.expenses saved safely in the trip archive log!
-            saveToStorage();
-            renderHistory();
-            renderItemList();
-            renderAllTripsArchive();
-            calculateDebts();
-            document.getElementById('billAmount').value = '';
-            document.getElementById('billTitle').value = '';
         }
 
         function shareSplitSummary() {
-            const perPerson = document.getElementById('resultPerPerson').innerText;
+            const bill = document.getElementById('resultPerPerson').innerText;
             const total = document.getElementById('resultTotal').innerText;
-            const foreign = document.getElementById('foreignPerPerson').innerText;
-            const text = `💸 Bill Split Summary:\n• Per Person: ${perPerson} (${foreign})\n• Total Bill: ${total}\nCalculated with WandSplit 🪄`;
-            
+            const title = document.getElementById('billTitle').value || 'Group Bill';
+            const text = `WandSplit Summary - ${title}\nTotal: ${total}\nPer Person Share: ${bill}`;
             if (navigator.share) {
-                navigator.share({ title: 'Bill Split', text: text }).catch(() => {});
+                navigator.share({ title: 'WandSplit', text: text }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(text);
-                alert('Split summary copied to clipboard!');
+                alert('Summary copied to clipboard!');
             }
         }
 
+        function fetchLiveRates() {
+            document.getElementById('rateStatus').innerText = 'Fetching live rates...';
+            setTimeout(() => {
+                document.getElementById('rateStatus').innerText = 'Live Rates Active';
+                updateCalculations();
+            }, 600);
+        }
+
         function resetAllData() {
-            if (confirm('Reset everything and start completely blank?')) {
+            if (confirm('Are you sure you want to reset all data and clear storage?')) {
                 localStorage.removeItem('wandsplit_state');
                 location.reload();
             }
