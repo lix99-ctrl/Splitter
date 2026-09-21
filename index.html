@@ -131,12 +131,6 @@
         <!-- ================= EXPENSES TAB ================= -->
         <div id="section-expenses" class="space-y-4 hidden">
             
-            <!-- Entry Mode Toggle Sub-tabs -->
-            <div class="bg-slate-800/90 border border-slate-700/70 rounded-xl p-1 flex space-x-1 text-xs font-semibold">
-                <button onclick="switchExpenseMode('quick')" id="mode-btn-quick" class="flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm">Quick / Even Split</button>
-                <button onclick="switchExpenseMode('itemized')" id="mode-btn-itemized" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">Custom Itemized</button>
-            </div>
-
             <!-- Currency Settings Card (Base & Local Currencies) -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <h3 class="font-bold text-xs text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-coins text-indigo-400 mr-1.5"></i> Currency Settings</h3>
@@ -239,34 +233,6 @@
                 </div>
             </div>
 
-            <!-- Custom Itemized Split Section Wrapper -->
-            <div id="expense-mode-itemized" class="space-y-4 hidden">
-                <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split (Local Currency)</h3>
-                        <button onclick="addItemRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> Add Item</button>
-                    </div>
-                    <p class="text-xs text-slate-400">Add individual items, assign them to multiple people or leave unassigned to split evenly.</p>
-
-                    <div id="itemList" class="space-y-3 pt-2">
-                        <!-- Dynamically populated rows -->
-                    </div>
-
-                    <div class="pt-3 border-t border-slate-700/70 space-y-2">
-                        <div class="flex justify-between text-xs font-semibold text-slate-400">
-                            <span>Participant Totals</span>
-                            <span>Total: <span id="itemizedTotalSum" class="text-white">$0.00</span></span>
-                        </div>
-                        <div id="itemizedPersonBreakdown" class="space-y-1.5 pt-1">
-                            <!-- Populated dynamically -->
-                        </div>
-                        <button onclick="saveItemizedToLog()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
-                            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Record Itemized Bill</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Full Expense Log Card -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
@@ -364,8 +330,7 @@
                     baseCurrency: 'USD',
                     localCurrency: 'USD',
                     participants: [],
-                    expenses: [],
-                    items: []
+                    expenses: []
                 }
             ]
         };
@@ -389,7 +354,6 @@
             renderParticipants();
             renderPayerDropdown();
             renderQuickSplitCheckboxes();
-            renderItemList();
             renderHistory();
             renderDashboard();
             renderAllTripsArchive();
@@ -458,33 +422,11 @@
                 syncTripCurrencyUI();
                 renderPayerDropdown();
                 renderQuickSplitCheckboxes();
-                renderItemList();
                 renderHistory();
                 updateCalculations();
             }
             if (tabId === 'settle') {
                 calculateDebts();
-            }
-        }
-
-        function switchExpenseMode(mode) {
-            const quickEl = document.getElementById('expense-mode-quick');
-            const itemEl = document.getElementById('expense-mode-itemized');
-            const btnQuick = document.getElementById('mode-btn-quick');
-            const btnItem = document.getElementById('mode-btn-itemized');
-
-            if (mode === 'quick') {
-                quickEl.classList.remove('hidden');
-                itemEl.classList.add('hidden');
-                btnQuick.className = "flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm";
-                btnItem.className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
-                renderQuickSplitCheckboxes();
-            } else {
-                quickEl.classList.add('hidden');
-                itemEl.classList.remove('hidden');
-                btnItem.className = "flex-1 py-2 rounded-lg text-center transition bg-indigo-600 text-white shadow-sm";
-                btnQuick.className = "flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white";
-                renderItemList();
             }
         }
 
@@ -507,7 +449,6 @@
             renderParticipants();
             renderPayerDropdown();
             renderQuickSplitCheckboxes();
-            renderItemList();
             renderHistory();
             renderDashboard();
             renderAllTripsArchive();
@@ -534,8 +475,7 @@
                 baseCurrency: 'USD',
                 localCurrency: 'USD',
                 participants: [],
-                expenses: [],
-                items: []
+                expenses: []
             };
             state.trips.push(newTrip);
             state.currentTripId = newTrip.id;
@@ -545,7 +485,6 @@
             renderParticipants();
             renderPayerDropdown();
             renderQuickSplitCheckboxes();
-            renderItemList();
             renderHistory();
             renderDashboard();
             renderAllTripsArchive();
@@ -668,7 +607,6 @@
                 renderParticipants();
                 renderPayerDropdown();
                 renderQuickSplitCheckboxes();
-                renderItemList();
                 renderHistory();
                 renderDashboard();
                 renderAllTripsArchive();
@@ -685,7 +623,6 @@
             saveToStorage();
             syncTripCurrencyUI();
             updateCalculations();
-            renderItemList();
             renderHistory();
             renderDashboard();
             renderAllTripsArchive();
@@ -766,7 +703,6 @@
                 renderParticipants();
                 renderPayerDropdown();
                 renderQuickSplitCheckboxes();
-                renderItemList();
                 calculateDebts();
             }
             closeAddPersonModal();
@@ -780,7 +716,6 @@
                 renderParticipants();
                 renderPayerDropdown();
                 renderQuickSplitCheckboxes();
-                renderItemList();
                 calculateDebts();
             }
         }
@@ -793,7 +728,6 @@
                 renderParticipants();
                 renderPayerDropdown();
                 renderQuickSplitCheckboxes();
-                renderItemList();
                 calculateDebts();
             }
         }
@@ -823,139 +757,6 @@
                 return;
             }
             select.innerHTML = trip.participants.map(p => `<option value="${p}">${p}</option>`).join('');
-        }
-
-        function addItemRow() {
-            const trip = getCurrentTrip();
-            if (!trip) return;
-            trip.items.push({ name: '', price: '', assignedTo: [] });
-            saveToStorage();
-            renderItemList();
-        }
-
-        function removeItemRow(index) {
-            const trip = getCurrentTrip();
-            if (!trip) return;
-            trip.items.splice(index, 1);
-            saveToStorage();
-            renderItemList();
-        }
-
-        function updateItemName(index, val) {
-            const trip = getCurrentTrip();
-            if (!trip || !trip.items[index]) return;
-            trip.items[index].name = val;
-            saveToStorage();
-        }
-
-        function updateItemPrice(index, val) {
-            const trip = getCurrentTrip();
-            if (!trip || !trip.items[index]) return;
-            trip.items[index].price = val;
-            saveToStorage();
-            updateItemizedTotalsDisplay();
-        }
-
-        function toggleItemAssignment(itemIndex, participantName) {
-            const trip = getCurrentTrip();
-            if (!trip || !trip.items[itemIndex]) return;
-            if (!Array.isArray(trip.items[itemIndex].assignedTo)) {
-                trip.items[itemIndex].assignedTo = [];
-            }
-            const idx = trip.items[itemIndex].assignedTo.indexOf(participantName);
-            if (idx > -1) {
-                trip.items[itemIndex].assignedTo.splice(idx, 1);
-            } else {
-                trip.items[itemIndex].assignedTo.push(participantName);
-            }
-            saveToStorage();
-            updateItemizedTotalsDisplay();
-        }
-
-        function updateItemizedTotalsDisplay() {
-            const trip = getCurrentTrip();
-            if (!trip) return;
-            const sym = currencySymbols[trip.localCurrency || 'USD'] || '$';
-
-            let totals = {};
-            trip.participants.forEach(p => totals[p] = 0);
-            let itemTotalSum = 0;
-
-            trip.items.forEach(item => {
-                const pVal = parseFloat(item.price) || 0;
-                itemTotalSum += pVal;
-                const assigned = item.assignedTo || [];
-
-                if (assigned.length > 0) {
-                    let splitVal = pVal / assigned.length;
-                    assigned.forEach(p => {
-                        if (totals[p] !== undefined) totals[p] += splitVal;
-                    });
-                } else if (trip.participants.length > 0) {
-                    let splitVal = pVal / trip.participants.length;
-                    trip.participants.forEach(p => totals[p] += splitVal);
-                }
-            });
-
-            document.getElementById('itemizedTotalSum').innerText = sym + itemTotalSum.toFixed(2);
-
-            const breakdownContainer = document.getElementById('itemizedPersonBreakdown');
-            if (breakdownContainer) {
-                breakdownContainer.innerHTML = Object.keys(totals).map(p => `
-                    <div class="flex justify-between text-xs bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                        <span class="text-slate-300 font-medium">${p}</span>
-                        <span class="font-bold text-indigo-400">${sym}${totals[p].toFixed(2)}</span>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function renderItemList() {
-            const container = document.getElementById('itemList');
-            if (!container) return;
-            const trip = getCurrentTrip();
-            if (!trip) return;
-
-            const sym = currencySymbols[trip.localCurrency || 'USD'] || '$';
-
-            if (trip.items.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">No custom items added.</p>`;
-                updateItemizedTotalsDisplay();
-                return;
-            }
-
-            container.innerHTML = trip.items.map((item, idx) => {
-                if (!Array.isArray(item.assignedTo)) item.assignedTo = [];
-                return `
-                    <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2.5">
-                        <div class="flex items-center space-x-2">
-                            <input type="text" placeholder="Item Name" value="${item.name || ''}" oninput="updateItemName(${idx}, this.value)" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 px-2.5 focus:outline-none focus:border-indigo-500 text-white font-medium">
-                            <div class="relative w-28">
-                                <span class="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">${sym}</span>
-                                <input type="number" placeholder="0.00" value="${item.price !== undefined ? item.price : ''}" oninput="updateItemPrice(${idx}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 pl-6 pr-2 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
-                            </div>
-                        </div>
-                        <div class="space-y-1.5 pt-1 border-t border-slate-800">
-                            <div class="flex justify-between items-center text-[11px]">
-                                <span class="text-slate-400">Assigned To (Multi-select, empty = split all):</span>
-                                <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash-can mr-1"></i> Remove</button>
-                            </div>
-                            <div class="flex flex-wrap gap-1.5 pt-0.5">
-                                ${trip.participants.length === 0 ? '<span class="text-[11px] text-slate-500 italic">No participants</span>' : trip.participants.map(p => {
-                                    const isChecked = item.assignedTo.includes(p);
-                                    return `
-                                        <button type="button" onclick="toggleItemAssignment(${idx}, '${p}')" class="px-2 py-1 rounded-lg text-[11px] font-medium border transition ${isChecked ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'}">
-                                            ${p}
-                                        </button>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            updateItemizedTotalsDisplay();
         }
 
         function saveQuickBillToLog() {
@@ -1000,37 +801,6 @@
             renderDashboard();
             calculateDebts();
             alert('Bill successfully saved to trip log!');
-            switchTab('dashboard');
-        }
-
-        function saveItemizedToLog() {
-            const trip = getCurrentTrip();
-            if (!trip || trip.items.length === 0) {
-                alert('Please add items to itemize.');
-                return;
-            }
-            let itemTotalSum = trip.items.reduce((acc, i) => acc + (parseFloat(i.price) || 0), 0);
-            if (itemTotalSum <= 0) {
-                alert('Item total must be greater than zero.');
-                return;
-            }
-            const payer = trip.participants[0] || 'Someone';
-
-            trip.expenses.push({
-                id: Date.now(),
-                title: 'Itemized Receipt',
-                total: itemTotalSum,
-                payer: payer,
-                date: new Date().toLocaleDateString()
-            });
-
-            trip.items = [];
-            saveToStorage();
-            renderItemList();
-            renderHistory();
-            renderDashboard();
-            calculateDebts();
-            alert('Itemized bill recorded successfully!');
             switchTab('dashboard');
         }
 
@@ -1167,4 +937,3 @@
     </script>
 </body>
 </html>
-
