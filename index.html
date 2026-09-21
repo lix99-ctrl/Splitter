@@ -842,6 +842,7 @@
             trip.expenses = trip.expenses.filter(e => e.id !== id);
             saveToStorage();
             renderHistory();
+            renderAllTripsArchive();
             calculateDebts();
         }
 
@@ -920,11 +921,11 @@
             });
 
             const trip = getCurrentTrip();
-            trip.expenses = [];
-            trip.items = [];
+            trip.items = []; // Reset itemized rows only, keep trip.expenses saved safely in the trip archive log!
             saveToStorage();
             renderHistory();
             renderItemList();
+            renderAllTripsArchive();
             calculateDebts();
             document.getElementById('billAmount').value = '';
             document.getElementById('billTitle').value = '';
