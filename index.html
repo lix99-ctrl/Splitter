@@ -313,7 +313,6 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // State Management with Multiple Trips and Blank Initial Setup
         let state = {
             darkMode: true,
             baseCurrency: 'USD',
@@ -323,7 +322,7 @@
             trips: [
                 {
                     id: 1,
-                    name: 'El Tunco Trip',
+                    name: 'My First Trip',
                     participants: [],
                     expenses: [],
                     items: []
@@ -342,7 +341,6 @@
             return trip;
         }
 
-        // Initialize App on load
         window.onload = function() {
             loadFromStorage();
             initTabs();
@@ -388,7 +386,6 @@
             saveToStorage();
         }
 
-        // Tab Switching
         function switchTab(tabId) {
             ['quick', 'items', 'history', 'settle'].forEach(t => {
                 document.getElementById(`section-${t}`).classList.add('hidden');
@@ -405,7 +402,6 @@
             switchTab('quick');
         }
 
-        // Trip Management Functions
         function renderTripSelector() {
             const select = document.getElementById('tripSelector');
             if (!select) return;
@@ -455,7 +451,6 @@
             closeAddTripModal();
         }
 
-        // Quick Split Calculations
         function updateCalculations() {
             const bill = parseFloat(document.getElementById('billAmount').value) || 0;
             const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
@@ -526,7 +521,6 @@
             }
         }
 
-        // Participants & Payer management
         function renderParticipants() {
             const trip = getCurrentTrip();
             const container = document.getElementById('participantsList');
@@ -593,7 +587,6 @@
             }
         }
 
-        // Itemized Split Logic
         function renderItemList() {
             const trip = getCurrentTrip();
             const container = document.getElementById('itemList');
@@ -697,7 +690,6 @@
             return totals;
         }
 
-        // Expense Log & Saving Tabs
         function saveQuickBillToLog() {
             const trip = getCurrentTrip();
             if (trip.participants.length === 0) {
@@ -795,7 +787,6 @@
             calculateDebts();
         }
 
-        // Debt Simplification Engine
         function calculateDebts() {
             const trip = getCurrentTrip();
             const balances = {};
