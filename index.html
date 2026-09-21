@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="toggleDarkMode()" id="darkModeBtn" class="p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition">
+                <button onclick="toggleDarkMode()" id="darkModeBtn" class="p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition" title="Toggle Dark/Light Mode">
                     <i class="fa-solid fa-moon"></i>
                 </button>
                 <button onclick="resetAllData()" class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition text-xs font-medium flex items-center space-x-1" title="Reset All Data">
@@ -250,6 +250,14 @@
                     <!-- Populated dynamically -->
                 </div>
             </div>
+
+            <!-- All Saved Trips Archive -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-box-archive text-indigo-400 mr-1.5"></i> All Saved Trips Archive</h3>
+                <div id="allTripsArchiveList" class="space-y-2 pt-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
         </div>
 
         <!-- ================= SETTLE UP TAB ================= -->
@@ -349,6 +357,7 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderAllTripsArchive();
             calculateDebts();
             updateCalculations();
         };
@@ -394,7 +403,7 @@
             document.getElementById(`section-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).className = "flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm";
             if (tabId === 'items') renderItemList();
-            if (tabId === 'history') { renderTripSelector(); renderHistory(); }
+            if (tabId === 'history') { renderTripSelector(); renderHistory(); renderAllTripsArchive(); }
             if (tabId === 'settle') calculateDebts();
         }
 
@@ -417,6 +426,7 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderAllTripsArchive();
             calculateDebts();
         }
 
@@ -447,8 +457,55 @@
             renderPayerDropdown();
             renderItemList();
             renderHistory();
+            renderAllTripsArchive();
             calculateDebts();
             closeAddTripModal();
+        }
+
+        function renderAllTripsArchive() {
+            const container = document.getElementById('allTripsArchiveList');
+            if (!container) return;
+
+            container.innerHTML = state.trips.map(trip => {
+                const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
+                const isCurrent = trip.id === state.currentTripId;
+                return `
+                    <div class="bg-slate-900 border ${isCurrent ? 'border-indigo-500/80 shadow-md' : 'border-slate-700/80'} rounded-xl p-3 flex justify-between items-center text-xs">
+                        <div>
+                            <div class="font-bold text-white flex items-center space-x-1.5">
+                                <span>${trip.name}</span>
+                                ${isCurrent ? '<span class="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-full font-semibold">Active</span>' : ''}
+                            </div>
+                            <p class="text-[10px] text-slate-400">${trip.participants.length} members • ${trip.expenses.length} bills • Total: $${totalSpend.toFixed(2)}</p>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            ${!isCurrent ? `<button onclick="switchActiveTrip(${trip.id}); switchTab('quick');" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded-lg text-[10px] transition">Open</button>` : ''}
+                            ${state.trips.length > 1 ? `<button onclick="deleteTrip(${trip.id})" class="text-rose-400 hover:text-rose-300 p-1 text-xs" title="Delete Trip"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteTrip(tripId) {
+            if (state.trips.length <= 1) {
+                alert('You must keep at least one trip.');
+                return;
+            }
+            if (confirm('Are you sure you want to delete this archived trip?')) {
+                state.trips = state.trips.filter(t => t.id !== tripId);
+                if (state.currentTripId === tripId) {
+                    state.currentTripId = state.trips[0].id;
+                }
+                saveToStorage();
+                renderTripSelector();
+                renderParticipants();
+                renderPayerDropdown();
+                renderItemList();
+                renderHistory();
+                renderAllTripsArchive();
+                calculateDebts();
+            }
         }
 
         function updateCalculations() {
@@ -743,6 +800,7 @@
             };
 
             trip.expenses.push(expense);
+            trip.items = []; // Clear current items after recording
             saveToStorage();
             switchTab('history');
         }
@@ -860,6 +918,16 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
+
+            const trip = getCurrentTrip();
+            trip.expenses = [];
+            trip.items = [];
+            saveToStorage();
+            renderHistory();
+            renderItemList();
+            calculateDebts();
+            document.getElementById('billAmount').value = '';
+            document.getElementById('billTitle').value = '';
         }
 
         function shareSplitSummary() {
