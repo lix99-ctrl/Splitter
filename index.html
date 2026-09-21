@@ -40,7 +40,7 @@
                 <button onclick="toggleDarkMode()" id="darkModeBtn" class="p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition">
                     <i class="fa-solid fa-moon"></i>
                 </button>
-                <button onclick="resetAllData()" class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition text-xs font-medium flex items-center space-x-1">
+                <button onclick="resetAllData()" class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition text-xs font-medium flex items-center space-x-1" title="Reset All Data">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
             </div>
@@ -57,7 +57,7 @@
                 <i class="fa-solid fa-receipt mb-1 block"></i> Itemize Bill
             </button>
             <button onclick="switchTab('history')" id="tab-history" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
-                <i class="fa-solid fa-book-bookmark mb-1 block"></i> Tab Log
+                <i class="fa-solid fa-book-bookmark mb-1 block"></i> Trips & Log
             </button>
             <button onclick="switchTab('settle')" id="tab-settle" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">
                 <i class="fa-solid fa-handshake-angle mb-1 block"></i> Settle Up
@@ -186,7 +186,7 @@
 
                 <div class="grid grid-cols-2 gap-2 pt-2">
                     <button onclick="saveQuickBillToLog()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center justify-center space-x-1.5">
-                        <i class="fa-solid fa-floppy-disk"></i> <span>Save to Tab Log</span>
+                        <i class="fa-solid fa-floppy-disk"></i> <span>Save to Trip Log</span>
                     </button>
                     <button onclick="shareSplitSummary()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
                         <i class="fa-solid fa-share-nodes"></i> <span>Share Text</span>
@@ -225,8 +225,22 @@
             </div>
         </div>
 
-        <!-- ================= TAB HISTORY LOG ================= -->
+        <!-- ================= TRIPS & TAB HISTORY LOG ================= -->
         <div id="section-history" class="space-y-4 hidden">
+            <!-- Trip Manager Card -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-map-location-dot text-indigo-400 mr-1.5"></i> Active Trip</h3>
+                    <button onclick="openAddTripModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> New Trip</button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select id="tripSelector" onchange="switchActiveTrip(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Expense Log Card -->
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-clock-rotate-left text-indigo-400 mr-1.5"></i> Trip Expense Log</h3>
@@ -234,7 +248,6 @@
                 </div>
                 <div id="expenseHistoryList" class="space-y-2.5 pt-1">
                     <!-- Populated dynamically -->
-                    <div class="text-center py-8 text-xs text-slate-500 italic">No saved bills yet. Quick split or itemize a bill to log it here!</div>
                 </div>
             </div>
         </div>
@@ -244,7 +257,10 @@
             <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-users text-indigo-400 mr-1.5"></i> Trip Participants</h3>
-                    <button onclick="openAddPersonModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Add Person</button>
+                    <div class="space-x-1">
+                        <button onclick="clearAllParticipants()" class="text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-trash-can mr-1"></i> Clear All</button>
+                        <button onclick="openAddPersonModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-user-plus mr-1"></i> Add</button>
+                    </div>
                 </div>
                 <div id="participantsList" class="flex flex-wrap gap-2 pt-1">
                     <!-- Populated dynamically -->
@@ -275,7 +291,7 @@
     <div id="personModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
             <h3 class="font-bold text-sm text-white">Add Group Member</h3>
-            <input type="text" id="newPersonName" placeholder="Name (e.g. Sarah)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+            <input type="text" id="newPersonName" placeholder="Name (e.g. Sarah)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
             <div class="flex space-x-2 pt-2">
                 <button onclick="closeAddPersonModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-xl text-xs transition">Cancel</button>
                 <button onclick="addPerson()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-xl text-xs font-medium transition">Add</button>
@@ -283,29 +299,54 @@
         </div>
     </div>
 
+    <!-- Modal for Adding New Trip -->
+    <div id="tripModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
+            <h3 class="font-bold text-sm text-white">Create New Trip</h3>
+            <input type="text" id="newTripName" placeholder="Trip Name (e.g. El Tunco Getaway)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white">
+            <div class="flex space-x-2 pt-2">
+                <button onclick="closeAddTripModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 py-2 rounded-xl text-xs transition">Cancel</button>
+                <button onclick="addNewTrip()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 py-2 rounded-xl text-xs font-medium transition">Create</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Application Logic -->
     <script>
-        // State Management
+        // State Management with Multiple Trips and Blank Initial Setup
         let state = {
             darkMode: true,
             baseCurrency: 'USD',
             foreignCurrency: 'SVC',
             exchangeRate: 8.75,
-            participants: ['Mark', 'Anna', 'John', 'Sarah'],
-            expenses: [],
-            items: [
-                { name: 'Appetizers', price: 15.00, assignedTo: ['Mark', 'Anna'] },
-                { name: 'Seafood Plate', price: 28.50, assignedTo: ['Mark'] },
-                { name: 'Cocktails', price: 24.00, assignedTo: ['Mark', 'Anna', 'John', 'Sarah'] }
+            currentTripId: 1,
+            trips: [
+                {
+                    id: 1,
+                    name: 'El Tunco Trip',
+                    participants: [],
+                    expenses: [],
+                    items: []
+                }
             ]
         };
 
         const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', SVC: '₡', MXN: '$', COP: '$' };
 
+        function getCurrentTrip() {
+            let trip = state.trips.find(t => t.id === state.currentTripId);
+            if (!trip && state.trips.length > 0) {
+                state.currentTripId = state.trips[0].id;
+                trip = state.trips[0];
+            }
+            return trip;
+        }
+
         // Initialize App on load
         window.onload = function() {
             loadFromStorage();
             initTabs();
+            renderTripSelector();
             renderParticipants();
             renderPayerDropdown();
             renderItemList();
@@ -356,12 +397,62 @@
             document.getElementById(`section-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).className = "flex-1 py-2 rounded-lg text-center transition text-indigo-400 bg-slate-700/60 shadow-sm";
             if (tabId === 'items') renderItemList();
-            if (tabId === 'history') renderHistory();
+            if (tabId === 'history') { renderTripSelector(); renderHistory(); }
             if (tabId === 'settle') calculateDebts();
         }
 
         function initTabs() {
             switchTab('quick');
+        }
+
+        // Trip Management Functions
+        function renderTripSelector() {
+            const select = document.getElementById('tripSelector');
+            if (!select) return;
+            select.innerHTML = state.trips.map(trip => `
+                <option value="${trip.id}" ${trip.id === state.currentTripId ? 'selected' : ''}>${trip.name}</option>
+            `).join('');
+        }
+
+        function switchActiveTrip(tripId) {
+            state.currentTripId = parseInt(tripId);
+            saveToStorage();
+            renderParticipants();
+            renderPayerDropdown();
+            renderItemList();
+            renderHistory();
+            calculateDebts();
+        }
+
+        function openAddTripModal() {
+            document.getElementById('tripModal').classList.remove('hidden');
+            document.getElementById('newTripName').value = '';
+        }
+
+        function closeAddTripModal() {
+            document.getElementById('tripModal').classList.add('hidden');
+        }
+
+        function addNewTrip() {
+            const name = document.getElementById('newTripName').value.trim();
+            if (!name) return;
+            const newTrip = {
+                id: Date.now(),
+                name: name,
+                participants: [],
+                expenses: [],
+                items: []
+            };
+            state.trips.push(newTrip);
+            state.currentTripId = newTrip.id;
+            saveToStorage();
+            renderTripSelector();
+            renderParticipants();
+            renderPayerDropdown();
+            renderItemList();
+            renderHistory();
+            calculateDebts();
+            closeAddTripModal();
         }
 
         // Quick Split Calculations
@@ -396,7 +487,6 @@
             document.getElementById('resultPerPerson').innerText = sym + perPerson.toFixed(2);
             document.getElementById('resultTotal').innerText = sym + totalWithExtras.toFixed(2);
 
-            // Foreign Currency Conversion
             const foreignAmount = perPerson * state.exchangeRate;
             const foreignSym = currencySymbols[state.foreignCurrency] || '';
             document.getElementById('foreignPerPerson').innerText = `≈ ${foreignSym}${foreignAmount.toFixed(2)} ${state.foreignCurrency}`;
@@ -438,21 +528,33 @@
 
         // Participants & Payer management
         function renderParticipants() {
+            const trip = getCurrentTrip();
             const container = document.getElementById('participantsList');
-            container.innerHTML = state.participants.map((p, idx) => `
-                <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs flex items-center space-x-2">
-                    <span class="font-medium text-white">${p}</span>
-                    ${state.participants.length > 1 ? `<button onclick="removePerson(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>` : ''}
-                </div>
-            `).join('');
+            if (!container) return;
+
+            if (trip.participants.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 italic py-2">No participants added yet. Click 'Add' to begin.</div>`;
+            } else {
+                container.innerHTML = trip.participants.map((p, idx) => `
+                    <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs flex items-center space-x-2">
+                        <span class="font-medium text-white">${p}</span>
+                        <button onclick="removePerson(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `).join('');
+            }
             renderPayerDropdown();
             renderItemList();
         }
 
         function renderPayerDropdown() {
+            const trip = getCurrentTrip();
             const select = document.getElementById('billPayer');
             if (!select) return;
-            select.innerHTML = state.participants.map(p => `<option value="${p}">${p}</option>`).join('');
+            if (trip.participants.length === 0) {
+                select.innerHTML = `<option value="">No participants</option>`;
+            } else {
+                select.innerHTML = trip.participants.map(p => `<option value="${p}">${p}</option>`).join('');
+            }
         }
 
         function openAddPersonModal() {
@@ -465,9 +567,10 @@
         }
 
         function addPerson() {
+            const trip = getCurrentTrip();
             const name = document.getElementById('newPersonName').value.trim();
-            if (name && !state.participants.includes(name)) {
-                state.participants.push(name);
+            if (name && !trip.participants.includes(name)) {
+                trip.participants.push(name);
                 renderParticipants();
                 closeAddPersonModal();
                 saveToStorage();
@@ -475,27 +578,44 @@
         }
 
         function removePerson(idx) {
-            if (state.participants.length <= 1) return;
-            const removed = state.participants.splice(idx, 1)[0];
+            const trip = getCurrentTrip();
+            trip.participants.splice(idx, 1);
             renderParticipants();
             saveToStorage();
         }
 
+        function clearAllParticipants() {
+            const trip = getCurrentTrip();
+            if (confirm('Clear all participants for this trip?')) {
+                trip.participants = [];
+                renderParticipants();
+                saveToStorage();
+            }
+        }
+
         // Itemized Split Logic
         function renderItemList() {
+            const trip = getCurrentTrip();
             const container = document.getElementById('itemList');
             if (!container) return;
             
-            container.innerHTML = state.items.map((item, idx) => `
+            if (trip.items.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 italic text-center py-3">No custom items added.</div>`;
+                document.getElementById('itemizedTotalSum').innerText = '$0.00';
+                document.getElementById('itemizedPersonBreakdown').innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = trip.items.map((item, idx) => `
                 <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-2">
                     <div class="flex items-center space-x-2">
-                        <input type="text" value="${item.name}" oninput="updateItemName(${idx}, this.value)" placeholder="Item name" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs flex-1 focus:outline-none focus:border-indigo-500">
-                        <input type="number" value="${item.price}" step="0.5" oninput="updateItemPrice(${idx}, this.value)" placeholder="0.00" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs w-20 focus:outline-none focus:border-indigo-500 font-bold">
+                        <input type="text" value="${item.name}" oninput="updateItemName(${idx}, this.value)" placeholder="Item name" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs flex-1 focus:outline-none focus:border-indigo-500 text-white">
+                        <input type="number" value="${item.price}" step="0.5" oninput="updateItemPrice(${idx}, this.value)" placeholder="0.00" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs w-20 focus:outline-none focus:border-indigo-500 font-bold text-white">
                         <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
                     </div>
                     <div class="flex flex-wrap gap-1 pt-1">
                         <span class="text-[10px] text-slate-400 self-center mr-1">For:</span>
-                        ${state.participants.map(p => `
+                        ${trip.participants.length === 0 ? '<span class="text-[10px] text-slate-500 italic">Add participants first</span>' : trip.participants.map(p => `
                             <button onclick="toggleItemAssignment(${idx}, '${p}')" class="px-2 py-0.5 rounded text-[10px] font-medium transition ${item.assignedTo.includes(p) ? 'bg-indigo-600 text-white shadow' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">
                                 ${p}
                             </button>
@@ -508,30 +628,35 @@
         }
 
         function addItemRow() {
-            state.items.push({ name: 'New Item', price: 10.00, assignedTo: [...state.participants] });
+            const trip = getCurrentTrip();
+            trip.items.push({ name: 'New Item', price: 10.00, assignedTo: [...trip.participants] });
             renderItemList();
             saveToStorage();
         }
 
         function removeItemRow(idx) {
-            state.items.splice(idx, 1);
+            const trip = getCurrentTrip();
+            trip.items.splice(idx, 1);
             renderItemList();
             saveToStorage();
         }
 
         function updateItemName(idx, val) {
-            state.items[idx].name = val;
+            const trip = getCurrentTrip();
+            trip.items[idx].name = val;
             saveToStorage();
         }
 
         function updateItemPrice(idx, val) {
-            state.items[idx].price = parseFloat(val) || 0;
+            const trip = getCurrentTrip();
+            trip.items[idx].price = parseFloat(val) || 0;
             calculateItemizedTotals();
             saveToStorage();
         }
 
         function toggleItemAssignment(itemIdx, person) {
-            const item = state.items[itemIdx];
+            const trip = getCurrentTrip();
+            const item = trip.items[itemIdx];
             const pos = item.assignedTo.indexOf(person);
             if (pos > -1) {
                 if (item.assignedTo.length > 1) item.assignedTo.splice(pos, 1);
@@ -543,11 +668,12 @@
         }
 
         function calculateItemizedTotals() {
+            const trip = getCurrentTrip();
             const totals = {};
-            state.participants.forEach(p => totals[p] = 0);
+            trip.participants.forEach(p => totals[p] = 0);
             let grandTotal = 0;
 
-            state.items.forEach(item => {
+            trip.items.forEach(item => {
                 grandTotal += item.price;
                 const count = item.assignedTo.length;
                 if (count > 0) {
@@ -573,16 +699,22 @@
 
         // Expense Log & Saving Tabs
         function saveQuickBillToLog() {
+            const trip = getCurrentTrip();
+            if (trip.participants.length === 0) {
+                alert('Please add at least one participant in the Settle Up tab before saving bills.');
+                return;
+            }
             const bill = parseFloat(document.getElementById('billAmount').value) || 0;
             if (bill <= 0) return alert('Please enter a valid bill amount');
             const title = document.getElementById('billTitle').value.trim() || 'Quick Split Bill';
-            const payer = document.getElementById('billPayer').value;
+            const payer = document.getElementById('billPayer').value || trip.participants[0];
             const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
             
             const total = bill * (1 + (tipPct + taxPct)/100);
-            const share = total / splitCount;
+            const activeParticipants = trip.participants.slice(0, splitCount);
+            const share = activeParticipants.length > 0 ? total / activeParticipants.length : total;
 
             const expense = {
                 id: Date.now(),
@@ -590,15 +722,20 @@
                 total,
                 payer,
                 splitType: 'Equal',
-                shares: state.participants.slice(0, splitCount).reduce((acc, p) => { acc[p] = share; return acc; }, {})
+                shares: activeParticipants.reduce((acc, p) => { acc[p] = share; return acc; }, {})
             };
 
-            state.expenses.push(expense);
+            trip.expenses.push(expense);
             saveToStorage();
             switchTab('history');
         }
 
         function saveItemizedToLog() {
+            const trip = getCurrentTrip();
+            if (trip.participants.length === 0) {
+                alert('Please add participants first.');
+                return;
+            }
             const totals = calculateItemizedTotals();
             let grandTotal = 0;
             Object.values(totals).forEach(v => grandTotal += v);
@@ -608,27 +745,28 @@
                 id: Date.now(),
                 title: 'Itemized Bill (' + new Date().toLocaleDateString() + ')',
                 total: grandTotal,
-                payer: state.participants[0],
+                payer: trip.participants[0],
                 splitType: 'Itemized',
                 shares: totals
             };
 
-            state.expenses.push(expense);
+            trip.expenses.push(expense);
             saveToStorage();
             switchTab('history');
         }
 
         function renderHistory() {
+            const trip = getCurrentTrip();
             const container = document.getElementById('expenseHistoryList');
             let tripTotal = 0;
 
-            if (state.expenses.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500 italic">No saved bills yet. Quick split or itemize a bill to log it here!</div>`;
+            if (trip.expenses.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500 italic">No saved bills in this trip yet. Quick split or itemize a bill to log it here!</div>`;
                 document.getElementById('totalTripSpend').innerText = 'Total: $0.00';
                 return;
             }
 
-            container.innerHTML = state.expenses.map(exp => {
+            container.innerHTML = trip.expenses.map(exp => {
                 tripTotal += exp.total;
                 return `
                     <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-3 space-y-1.5">
@@ -650,7 +788,8 @@
         }
 
         function deleteExpense(id) {
-            state.expenses = state.expenses.filter(e => e.id !== id);
+            const trip = getCurrentTrip();
+            trip.expenses = trip.expenses.filter(e => e.id !== id);
             saveToStorage();
             renderHistory();
             calculateDebts();
@@ -658,10 +797,11 @@
 
         // Debt Simplification Engine
         function calculateDebts() {
+            const trip = getCurrentTrip();
             const balances = {};
-            state.participants.forEach(p => balances[p] = 0);
+            trip.participants.forEach(p => balances[p] = 0);
 
-            state.expenses.forEach(exp => {
+            trip.expenses.forEach(exp => {
                 if (balances[exp.payer] !== undefined) {
                     balances[exp.payer] += exp.total;
                 }
@@ -672,7 +812,6 @@
                 });
             });
 
-            // Separate creditors and debtors
             let debtors = [];
             let creditors = [];
             Object.entries(balances).forEach(([p, bal]) => {
@@ -703,6 +842,10 @@
             }
 
             const container = document.getElementById('settlementPlanList');
+            if (trip.participants.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-xs text-slate-500 italic">Add participants to calculate debts.</div>`;
+                return;
+            }
             if (transactions.length === 0) {
                 container.innerHTML = `<div class="text-center py-6 text-xs text-emerald-400 font-medium"><i class="fa-solid fa-check-circle mr-1"></i> Everyone is completely settled up!</div>`;
                 return;
@@ -743,7 +886,7 @@
         }
 
         function resetAllData() {
-            if (confirm('Reset all trip logs and settings?')) {
+            if (confirm('Reset everything and start completely blank?')) {
                 localStorage.removeItem('wandsplit_state');
                 location.reload();
             }
