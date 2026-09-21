@@ -137,23 +137,37 @@
                 <button onclick="switchExpenseMode('itemized')" id="mode-btn-itemized" class="flex-1 py-2 rounded-lg text-center transition text-slate-400 hover:text-white">Custom Itemized</button>
             </div>
 
-            <!-- Hidden Exchange Rate Data / Internal Conversion Engine -->
-            <div class="hidden">
-                <select id="baseCurrency" onchange="updateCalculations()">
-                    <option value="USD" selected>USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="CAD">CAD ($)</option>
-                    <option value="SVC">SVC (₡)</option>
-                </select>
-                <select id="foreignCurrency" onchange="updateCalculations()">
-                    <option value="SVC" selected>SVC (₡)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="MXN">MXN ($)</option>
-                    <option value="COP">COP ($)</option>
-                </select>
-                <input type="number" id="exchangeRate" value="8.75" step="0.01" oninput="updateCalculations()">
+            <!-- Currency Settings Card for Expenses -->
+            <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                <h3 class="font-bold text-xs text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-coins text-indigo-400 mr-1.5"></i> Currency & Conversion Settings</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Base Currency</label>
+                        <select id="baseCurrency" onchange="onCurrencyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="CAD">CAD ($)</option>
+                            <option value="AUD">AUD ($)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Local Currency</label>
+                        <select id="foreignCurrency" onchange="onCurrencyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold">
+                            <option value="SVC">SVC (₡)</option>
+                            <option value="JPY">JPY (¥)</option>
+                            <option value="MXN">MXN ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="COP">COP ($)</option>
+                            <option value="USD">USD ($)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Exchange Rate</label>
+                        <input type="number" id="exchangeRate" value="8.75" step="0.01" oninput="updateCalculations()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold text-right" title="How many Local Currency units equal 1 Base Currency unit?">
+                    </div>
+                </div>
+                <p id="conversionRateHint" class="text-[11px] text-slate-400 italic">1 USD = 8.75 SVC (Enter local amount below to convert to base currency automatically)</p>
             </div>
 
             <!-- Quick / Even Split Section Wrapper -->
@@ -161,8 +175,8 @@
                 <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-4">
                     <div class="space-y-1">
                         <div class="flex justify-between items-center">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Local Currency Bill Amount</label>
-                            <span class="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-medium">Input in Local Currency</span>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Local Currency Amount Received / Paid</label>
+                            <span class="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-medium">Input Local Currency</span>
                         </div>
                         <div class="relative">
                             <span id="currencySymbol" class="absolute left-4 top-3.5 text-slate-400 text-lg font-bold">₡</span>
@@ -225,7 +239,7 @@
 
                 <div class="bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-indigo-500/30 rounded-2xl p-4 shadow-lg space-y-3">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share (Base Currency)</span>
+                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Per Person Share (Converted)</span>
                         <span id="localPerPersonDisplay" class="text-xs font-semibold text-slate-300 bg-slate-900/80 px-2 py-0.5 rounded-full">--</span>
                     </div>
                     <div class="flex justify-between items-baseline">
@@ -248,12 +262,12 @@
             <div id="expense-mode-itemized" class="space-y-4 hidden">
                 <div class="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                     <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split (Local Currency)</h3>
+                        <h3 class="font-bold text-sm text-slate-200"><i class="fa-solid fa-receipt text-indigo-400 mr-1.5"></i> Custom Itemized Split</h3>
                         <button onclick="addItemRow()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i> Add Item</button>
                     </div>
-                    <p class="text-xs text-slate-400">Enter item costs in local currency. Amounts automatically convert to base currency.</p>
+                    <p class="text-xs text-slate-400">Enter item name, local currency cost, and choose who pays or splits it. Rates factor in silently.</p>
 
-                    <div id="itemList" class="space-y-2 pt-2">
+                    <div id="itemList" class="space-y-3 pt-2">
                         <!-- Dynamically populated rows -->
                     </div>
 
@@ -360,15 +374,15 @@
     <script>
         let state = {
             darkMode: true,
-            baseCurrency: 'USD',
-            foreignCurrency: 'SVC',
-            exchangeRate: 8.75,
             currentTripId: 1,
             trips: [
                 {
                     id: 1,
                     name: 'My First Trip',
                     budget: 0,
+                    baseCurrency: 'USD',
+                    foreignCurrency: 'SVC',
+                    exchangeRate: 8.75,
                     participants: [],
                     expenses: [],
                     items: []
@@ -376,7 +390,7 @@
             ]
         };
 
-        const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', SVC: '₡', MXN: '$', COP: '$' };
+        const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', AUD: '$', SVC: '₡', JPY: '¥', MXN: '$', COP: '$' };
 
         function getCurrentTrip() {
             let trip = state.trips.find(t => t.id === state.currentTripId);
@@ -391,6 +405,7 @@
             loadFromStorage();
             initTabs();
             renderTripSelector();
+            syncTripCurrencyUI();
             renderParticipants();
             renderPayerDropdown();
             renderItemList();
@@ -417,9 +432,18 @@
                 document.documentElement.classList.remove('dark');
                 document.getElementById('darkModeBtn').innerHTML = '<i class="fa-solid fa-moon"></i>';
             }
-            document.getElementById('baseCurrency').value = state.baseCurrency || 'USD';
-            document.getElementById('foreignCurrency').value = state.foreignCurrency || 'SVC';
-            document.getElementById('exchangeRate').value = state.exchangeRate || 8.75;
+        }
+
+        function syncTripCurrencyUI() {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+            if (!trip.baseCurrency) trip.baseCurrency = 'USD';
+            if (!trip.foreignCurrency) trip.foreignCurrency = 'SVC';
+            if (trip.exchangeRate === undefined) trip.exchangeRate = 8.75;
+
+            document.getElementById('baseCurrency').value = trip.baseCurrency;
+            document.getElementById('foreignCurrency').value = trip.foreignCurrency;
+            document.getElementById('exchangeRate').value = trip.exchangeRate;
         }
 
         function toggleDarkMode() {
@@ -451,8 +475,10 @@
                 renderAllTripsArchive();
             }
             if (tabId === 'expenses') {
+                syncTripCurrencyUI();
                 renderItemList();
                 renderHistory();
+                updateCalculations();
             }
             if (tabId === 'settle') {
                 calculateDebts();
@@ -494,6 +520,7 @@
         function switchActiveTrip(tripId) {
             state.currentTripId = parseInt(tripId);
             saveToStorage();
+            syncTripCurrencyUI();
             renderParticipants();
             renderPayerDropdown();
             renderItemList();
@@ -501,6 +528,7 @@
             renderDashboard();
             renderAllTripsArchive();
             calculateDebts();
+            updateCalculations();
         }
 
         function openAddTripModal() {
@@ -519,6 +547,9 @@
                 id: Date.now(),
                 name: name,
                 budget: 0,
+                baseCurrency: 'USD',
+                foreignCurrency: 'SVC',
+                exchangeRate: 8.75,
                 participants: [],
                 expenses: [],
                 items: []
@@ -527,6 +558,7 @@
             state.currentTripId = newTrip.id;
             saveToStorage();
             renderTripSelector();
+            syncTripCurrencyUI();
             renderParticipants();
             renderPayerDropdown();
             renderItemList();
@@ -563,7 +595,7 @@
             if (!trip) return;
 
             const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
-            const sym = currencySymbols[state.baseCurrency] || '$';
+            const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
 
             document.getElementById('dashboardSpentText').innerText = sym + totalSpend.toFixed(2);
 
@@ -616,9 +648,9 @@
             const container = document.getElementById('allTripsArchiveList');
             if (!container) return;
 
-            const sym = currencySymbols[state.baseCurrency] || '$';
             container.innerHTML = state.trips.map(trip => {
                 const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
+                const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
                 const isCurrent = trip.id === state.currentTripId;
                 return `
                     <div class="bg-slate-900 border ${isCurrent ? 'border-indigo-500/80 shadow-md' : 'border-slate-700/80'} rounded-xl p-3 flex justify-between items-center text-xs">
@@ -649,6 +681,7 @@
                 }
                 saveToStorage();
                 renderTripSelector();
+                syncTripCurrencyUI();
                 renderParticipants();
                 renderPayerDropdown();
                 renderItemList();
@@ -656,28 +689,47 @@
                 renderDashboard();
                 renderAllTripsArchive();
                 calculateDebts();
+                updateCalculations();
             }
         }
 
+        function onCurrencyChange() {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+            trip.baseCurrency = document.getElementById('baseCurrency').value;
+            trip.foreignCurrency = document.getElementById('foreignCurrency').value;
+            trip.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
+            saveToStorage();
+            updateCalculations();
+            renderItemList();
+            renderHistory();
+            renderDashboard();
+            renderAllTripsArchive();
+        }
+
         function updateCalculations() {
+            const trip = getCurrentTrip();
+            if (!trip) return;
+
             const localBill = parseFloat(document.getElementById('billAmount').value) || 0;
             const splitCount = parseInt(document.getElementById('splitCount').value) || 1;
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
             const roundUp = document.getElementById('roundUp').checked;
             
-            state.baseCurrency = document.getElementById('baseCurrency').value;
-            state.foreignCurrency = document.getElementById('foreignCurrency').value;
-            state.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
+            trip.baseCurrency = document.getElementById('baseCurrency').value;
+            trip.foreignCurrency = document.getElementById('foreignCurrency').value;
+            trip.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
 
             document.getElementById('tipValText').innerText = tipPct + '%';
             document.getElementById('taxValText').innerText = taxPct + '%';
             
-            const localSym = currencySymbols[state.foreignCurrency] || '₡';
-            const baseSym = currencySymbols[state.baseCurrency] || '$';
+            const localSym = currencySymbols[trip.foreignCurrency] || '₡';
+            const baseSym = currencySymbols[trip.baseCurrency] || '$';
             document.getElementById('currencySymbol').innerText = localSym;
+            document.getElementById('conversionRateHint').innerText = `1 ${trip.baseCurrency} = ${trip.exchangeRate} ${trip.foreignCurrency} (Enter local amount below to convert to base currency automatically)`;
 
-            // Step 1: Compute local currency total with tip & tax
+            // Compute local currency total with tip & tax
             const tipAmountLocal = localBill * (tipPct / 100);
             const taxAmountLocal = localBill * (taxPct / 100);
             let totalLocalWithExtras = localBill + tipAmountLocal + taxAmountLocal;
@@ -689,8 +741,8 @@
                 totalLocalWithExtras = localPerPerson * splitCount;
             }
 
-            // Step 2: Convert local currency amount to Base Currency (divide by exchange rate, e.g. local / rate = base)
-            const rate = state.exchangeRate > 0 ? state.exchangeRate : 1;
+            // Convert local currency amount to Base Currency (divide by exchange rate, e.g., local / rate = base)
+            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
             const basePerPerson = localPerPerson / rate;
             const baseTotal = totalLocalWithExtras / rate;
 
@@ -825,9 +877,9 @@
             const trip = getCurrentTrip();
             if (!trip) return;
 
-            const baseSym = currencySymbols[state.baseCurrency] || '$';
-            const localSym = currencySymbols[state.foreignCurrency] || '₡';
-            const rate = state.exchangeRate > 0 ? state.exchangeRate : 1;
+            const baseSym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
+            const localSym = currencySymbols[trip.foreignCurrency || 'SVC'] || '₡';
+            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
 
             if (trip.items.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">No custom items added.</p>`;
@@ -837,21 +889,28 @@
             }
 
             container.innerHTML = trip.items.map((item, idx) => `
-                <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2">
-                    <input type="text" placeholder="Item Name" value="${item.name}" oninput="updateItemData(${idx}, 'name', this.value)" class="flex-1 bg-transparent border-b border-slate-700 text-xs py-1 px-1 focus:outline-none focus:border-indigo-500 text-white">
-                    <div class="relative w-20">
-                        <span class="absolute left-1 top-1 text-[10px] text-slate-400">${localSym}</span>
-                        <input type="number" placeholder="0.00" value="${item.priceLocal || ''}" oninput="updateItemData(${idx}, 'priceLocal', this.value)" class="w-full bg-transparent border-b border-slate-700 text-xs py-1 pl-4 pr-1 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <input type="text" placeholder="Item Name (e.g. Tacos)" value="${item.name}" oninput="updateItemData(${idx}, 'name', this.value)" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 px-2.5 focus:outline-none focus:border-indigo-500 text-white font-medium">
+                        <div class="relative w-28">
+                            <span class="absolute left-2.5 top-1.5 text-xs text-slate-400 font-bold">${localSym}</span>
+                            <input type="number" placeholder="0.00" value="${item.priceLocal || ''}" oninput="updateItemData(${idx}, 'priceLocal', this.value)" class="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs py-1.5 pl-7 pr-2 text-right focus:outline-none focus:border-indigo-500 text-white font-bold">
+                        </div>
                     </div>
-                    <select onchange="updateItemData(${idx}, 'assignedTo', this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs py-1 px-1 text-slate-300 focus:outline-none">
-                        <option value="">Split Evenly</option>
-                        ${trip.participants.map(p => `<option value="${p}" ${item.assignedTo === p ? 'selected' : ''}>${p}</option>`).join('')}
-                    </select>
-                    <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 px-1 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                    <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800">
+                        <span class="text-slate-400">Assigned To:</span>
+                        <div class="flex items-center space-x-2">
+                            <select onchange="updateItemData(${idx}, 'assignedTo', this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs py-1 px-2 text-slate-300 focus:outline-none">
+                                <option value="">Split Evenly</option>
+                                ${trip.participants.map(p => `<option value="${p}" ${item.assignedTo === p ? 'selected' : ''}>${p}</option>`).join('')}
+                            </select>
+                            <button onclick="removeItemRow(${idx})" class="text-rose-400 hover:text-rose-300 p-1 text-xs" title="Remove Item"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
                 </div>
             `).join('');
 
-            // Calculate Itemized Totals per Person converted to Base Currency
+            // Calculate Itemized Totals per Person converted to Base Currency silently factoring in the rate
             let totalsBase = {};
             trip.participants.forEach(p => totalsBase[p] = 0);
             let itemTotalLocalSum = 0;
@@ -892,7 +951,7 @@
             const tipPct = parseFloat(document.getElementById('tipPercent').value) || 0;
             const taxPct = parseFloat(document.getElementById('taxPercent').value) || 0;
             const roundUp = document.getElementById('roundUp').checked;
-            const rate = state.exchangeRate > 0 ? state.exchangeRate : 1;
+            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
 
             const tipAmountLocal = localBill * (tipPct / 100);
             const taxAmountLocal = localBill * (taxPct / 100);
@@ -934,7 +993,7 @@
                 return;
             }
             const payer = trip.participants[0] || 'Someone';
-            const rate = state.exchangeRate > 0 ? state.exchangeRate : 1;
+            const rate = trip.exchangeRate > 0 ? trip.exchangeRate : 1;
             const baseTotal = itemTotalLocalSum / rate;
 
             trip.expenses.push({
@@ -961,7 +1020,7 @@
             const trip = getCurrentTrip();
             if (!trip) return;
 
-            const sym = currencySymbols[state.baseCurrency] || '$';
+            const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
             const totalSpend = trip.expenses.reduce((acc, exp) => acc + exp.total, 0);
             document.getElementById('totalTripSpend').innerText = `Total: ${sym}${totalSpend.toFixed(2)}`;
 
@@ -1034,7 +1093,7 @@
             while (i < debtors.length && j < creditors.length) {
                 let debtor = debtors[i];
                 let creditor = creditors[j];
-                let amt = Math.min(debtor.amount, creditor.amount);
+ vslet amt = Math.min(debtor.amount, creditor.amount);
 
                 transactions.push({ from: debtor.name, to: creditor.name, amount: amt });
 
@@ -1045,7 +1104,7 @@
                 if (creditor.amount < 0.01) j++;
             }
 
-            const sym = currencySymbols[state.baseCurrency] || '$';
+            const sym = currencySymbols[trip.baseCurrency || 'USD'] || '$';
 
             if (transactions.length === 0) {
                 container.innerHTML = `<p class="text-xs text-emerald-400 font-medium italic text-center py-2"><i class="fa-solid fa-circle-check mr-1"></i> All group debts are fully settled!</p>`;
@@ -1073,6 +1132,7 @@
         }
 
         function shareSplitSummary() {
+            const trip = getCurrentTrip();
             const bill = document.getElementById('resultPerPerson').innerText;
             const total = document.getElementById('resultTotal').innerText;
             const title = document.getElementById('billTitle').value || 'Group Bill';
@@ -1094,3 +1154,4 @@
     </script>
 </body>
 </html>
+
